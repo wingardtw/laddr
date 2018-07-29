@@ -1,0 +1,16 @@
+.navbar {
+    padding: 2.25rem 0px 0px 0px;
+    border-bottom: 2px solid #333;
+    grid-column: 2;
+}
+
+.navbar__list {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0px;
+    align-items: center;
+}
+
+.navbar__link {text-decoration: none;}
+.logo {height: 3.375rem;}
