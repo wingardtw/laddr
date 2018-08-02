@@ -1,0 +1,30 @@
+*, * {box-sizing: border-box;}
+
+h1, h2, p {margin: 0px; padding: 0px;}
+p {line-height: 1.5rem;}
+
+.App, .App-header, .main {
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) minmax(auto, 60rem) minmax(1rem, 1fr);
+  grid-gap: 1.5rem;
+}
+
+.App-logo {
+  height: 80px;
+}
+
+.App-header {
+  color: #333;
+  grid-column: 1/4;
+  display: grid;
+}
+
+.App-title {
+  font-size: 2.25rem;
+  grid-column: 2;
+}
+
+.main {
+  grid-column: 1/4;
+  display: grid;
+}
