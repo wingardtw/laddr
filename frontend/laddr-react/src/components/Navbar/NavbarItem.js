@@ -6,7 +6,7 @@ class NavbarItem extends Component {
         return (
             <li className="navbar__item">
                 <Link to={"/" + this.props.link}>
-                {this.props.link}</Link>
+                {this.props.linkTitle}</Link>
             </li>
         )
     }
