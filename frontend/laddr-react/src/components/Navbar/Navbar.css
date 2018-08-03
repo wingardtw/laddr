@@ -1,0 +1,15 @@
+.navbar__list {
+    display: flex;
+    padding: 0px;
+    list-style: none;
+    justify-content: center;
+}
+
+.navbar__item {
+    margin: 0rem 1rem;
+}
+
+.navbar__item > a {
+    text-decoration: none;
+    color: #333;
+}
