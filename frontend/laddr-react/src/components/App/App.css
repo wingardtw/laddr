@@ -1,0 +1,21 @@
+*,* {
+  box-sizing: border-box;
+}
+
+.wrapper {
+
+  display: grid;
+  grid-template-columns: minmax(1rem, 1fr) minmax(auto, 25rem) minmax(auto, 45rem) minmax(auto, 25rem) minmax(1rem, 1fr);
+  grid-gap: 1.5rem;
+}
+
+.route__container {grid-column: 1/6; grid-row: 2;}
+
+.navbar {
+  grid-column: 3;
+}
+
+h1, h2, h3, p, ul, li {
+  margin: 0px;
+  padding: 0px;
+}
