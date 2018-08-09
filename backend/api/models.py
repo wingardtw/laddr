@@ -110,13 +110,14 @@ class Membership(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey("Team", on_delete=models.CASCADE)
-    date_joined = models.DateField()
+    date_joined = models.DateTimeField(auto_now_add=True)
 
 
 class Team(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128, unique=True)
-    date_created = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)    
     members = models.ManyToManyField(User, through="Membership")
     is_real = models.BooleanField(default=True)
 
@@ -145,5 +146,6 @@ class PsychePreference(models.Model):
         on_delete=models.CASCADE, 
         related_name='%(class)s_offered_match'
     )
-    date_created = models.DateField(default=now)
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
     accepted = models.BooleanField(default=False)

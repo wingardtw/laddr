@@ -1,7 +1,11 @@
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 import api.serializers as serializers
-from api.models import Profile
+from api.models import (
+    Profile,
+    Team,
+)
+
 # Create your views here.
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -14,3 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
+
+class TeamViewSet(viewsets.ModelViewSet):
+    queryset = Team.objects.all()
+    serializer_class = serializers.TeamSerializer

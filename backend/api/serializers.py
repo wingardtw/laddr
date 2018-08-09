@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from api.models import Profile
+from api.models import (
+    Membership,
+    Profile,
+    Team,
+)
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -27,4 +31,24 @@ class ProfileSerializer(serializers.ModelSerializer):
             'preferred_johnny_rank',
             'preferred_timmy_rank',
             'preferred_spike_rank',
+        )
+
+class MembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Membership
+        fields = (
+            'user',
+            'date_joined',
+        )
+
+class TeamSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
+    class Meta:
+        model = Team
+        fields = (
+            'uuid',
+            'name',
+            'members',
+            'created_at',
+            'is_real',
         )
