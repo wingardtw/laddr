@@ -4,6 +4,8 @@ from api.models import (
     Membership,
     Profile,
     Team,
+    Availability,
+    PsychePreference
 )
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -52,3 +54,27 @@ class TeamSerializer(serializers.ModelSerializer):
             'created_at',
             'is_real',
         )
+
+class AvailabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Availability
+        fields = (
+            'uuid',
+            'start',
+            'end'
+        )
+
+class PsychePreferenceSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
+    class Meta:
+        model = PsychePreference
+        fields = (
+            'uuid',
+            'user',
+            'potential_match',
+            'created_at',
+            'updated_at',
+            'accepted'
+        )
+        

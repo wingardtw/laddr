@@ -4,6 +4,8 @@ import api.serializers as serializers
 from api.models import (
     Profile,
     Team,
+    Availability,
+    PsychePreference
 )
 
 # Create your views here.
@@ -22,3 +24,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class TeamViewSet(viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = serializers.TeamSerializer
+
+class AvailabilityViewSet(viewsets.ModelViewSet):
+    queryset = Availability.objects.all()
+    serializer_class = serializers.AvailabilitySerializer
+
+class PsychePreferenceViewSet(viewsets.ModelViewSet):
+    queryset = PsychePreference.objects.all()
+    serializer_class = serializers.PsychePreferenceSerializer
