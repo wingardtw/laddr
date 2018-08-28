@@ -5,16 +5,18 @@ from api.models import (
     Profile,
     Team,
     Availability,
-    PsychePreference
+    PsychePreference,
+    Psychograph,
 )
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email', 'groups')
 
+
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
     class Meta:
         model = Profile
         fields = (
@@ -27,6 +29,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'role',
             'rank',
             'is_real',
+            'num_profiles_ranked',
             'johnny_rank',
             'timmy_rank',
             'spike_rank',
@@ -34,6 +37,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             'preferred_timmy_rank',
             'preferred_spike_rank',
         )
+        read_only_fields = (
+            'num_profiles_ranked',
+        )
+
 
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,8 +50,8 @@ class MembershipSerializer(serializers.ModelSerializer):
             'date_joined',
         )
 
+
 class TeamSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
     class Meta:
         model = Team
         fields = (
@@ -54,6 +61,10 @@ class TeamSerializer(serializers.ModelSerializer):
             'created_at',
             'is_real',
         )
+        read_only_fields = (
+            'created_at',
+        )
+
 
 class AvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,17 +75,56 @@ class AvailabilitySerializer(serializers.ModelSerializer):
             'end'
         )
 
+
+class ProfilePsycheSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            'user',
+            'num_profiles_ranked',
+            'johnny_rank',
+            'timmy_rank',
+            'spike_rank',
+        )
+        read_only_fields = (
+            'num_profiles_ranked',
+            'timmy_rank',
+            'johnny_rank',
+            'spike_rank',
+        )
+
+
+class PsychographSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Psychograph
+        fields = (
+            'uuid',
+            'created_at',
+            'updated_at',
+            'timmy_rank',
+            'johnny_rank',
+            'spike_rank',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
 class PsychePreferenceSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
+    psychograph = PsychographSerializer()
+
     class Meta:
         model = PsychePreference
         fields = (
             'uuid',
             'user',
-            'potential_match',
+            'psychograph',
             'created_at',
             'updated_at',
             'accepted'
         )
-        
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )

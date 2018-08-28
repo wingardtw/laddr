@@ -24,6 +24,7 @@ router.register(r'profiles', views.ProfileViewSet)
 router.register(r'teams', views.TeamViewSet)
 router.register(r'availability',views.AvailabilityViewSet)
 router.register(r'psychepreferences',views.PsychePreferenceViewSet)
+router.register(r'psychographs', views.PsychographViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

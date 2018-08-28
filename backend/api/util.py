@@ -1,0 +1,24 @@
+from api.models import (
+    User,
+    Profile,
+    Psychograph,
+    PsychePreference,
+)
+
+def pass_judgement_profile(profile_id, suggested_match_id, judgement):
+    suggested_profile = Profile.objects.get(uuid=suggested_match_id)
+    psychograph = Psychograph.objects.get_or_create(
+        timmy_rank=suggested_profile.timmy_rank,
+        johnny_rank=suggested_profile.johnny_rank,
+        spike_rank=suggested_profile.spike_rank,
+    )
+    pass_judgement_psychograph(profile_id, psychograph, judgement)
+
+def pass_judgement_psychograph(profile_id, psychograph, judgement):
+    profile = Profile.objects.get(uuid=profile_id)
+    PsychPreference.objects.create(
+        user=profile,
+        psychograph=psychograph,
+        accepted=judgement,
+    )
+        

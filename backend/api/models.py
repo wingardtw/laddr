@@ -56,7 +56,9 @@ RANKS = (
 
 
 class Profile(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     summoner_name = models.CharField(max_length=50, null=True, blank=False)
     lol_server = models.CharField(
@@ -68,10 +70,14 @@ class Profile(models.Model):
     playstyle = models.CharField(
         max_length=40, choices=PLAYSTYLES, default="Conservative"
     )
-    top_champions = JSONField(default={"First": None, "Second": None, "Third": None})
+    top_champions = JSONField(
+        default={"First": None, "Second": None, "Third": None}
+    )
     favorite_color = models.CharField(max_length=15, blank=False, null=True)
     bio = models.TextField(max_length=500, blank=True, null=False)
-    role = models.CharField(max_length=15, choices=ROLES, null=True, blank=False)
+    role = models.CharField(
+        max_length=15, choices=ROLES, null=True, blank=False
+    )
     availability = JSONField(
         default={
             "Monday": False,
@@ -83,7 +89,9 @@ class Profile(models.Model):
             "Sunday": False,
         }
     )
-    rank = models.CharField(max_length=15, choices=RANKS, blank=False, null=True)
+    rank = models.CharField(
+        max_length=15, choices=RANKS, blank=False, null=True
+    )
     is_real = models.BooleanField(default=True)
 
     johnny_rank = models.IntegerField(default=0)
@@ -107,17 +115,21 @@ class Profile(models.Model):
 
 
 class Membership(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     team = models.ForeignKey("Team", on_delete=models.CASCADE)
     date_joined = models.DateTimeField(auto_now_add=True)
 
 
 class Team(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     name = models.CharField(max_length=128, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)    
+    updated_at = models.DateTimeField(auto_now=True)
     members = models.ManyToManyField(User, through="Membership")
     is_real = models.BooleanField(default=True)
 
@@ -126,26 +138,37 @@ class Team(models.Model):
 
 
 class Availability(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     start = models.DateTimeField()
     end = models.DateTimeField()
 
     def __str__(self):
         date_format = "%A %H:%M"
-        return "%s - %s" % (start.strftime(date_format), end.strftime(date_format))
+        return "%s - %s" % (
+            self.start.strftime(date_format),
+            self.end.strftime(date_format),
+        )
+
 
 class PsychePreference(models.Model):
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(
-        "Profile", 
-        on_delete=models.CASCADE, 
-        related_name='%(class)s_preference'
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
     )
-    potential_match = models.ForeignKey(
-        "Profile", 
-        on_delete=models.CASCADE, 
-        related_name='%(class)s_offered_match'
-    )
+    user = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    psychograph = models.ForeignKey("Psychograph", on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
     accepted = models.BooleanField(default=False)
+
+
+class Psychograph(models.Model):
+    uuid = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
+    johnny_rank = models.IntegerField(default=0)
+    spike_rank = models.IntegerField(default=0)
+    timmy_rank = models.IntegerField(default=0)
