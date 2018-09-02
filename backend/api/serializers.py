@@ -10,10 +10,10 @@ from api.models import (
 )
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ('id', 'username', 'email', 'groups')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -104,6 +104,7 @@ class PsychographSerializer(serializers.ModelSerializer):
             'timmy_rank',
             'johnny_rank',
             'spike_rank',
+            'calibrator',
         )
         read_only_fields = (
             'created_at',

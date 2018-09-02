@@ -1,9 +1,11 @@
 from api.models import (
-    User,
     Profile,
     Psychograph,
     PsychePreference,
+    User,
 )
+from api.serializers import ProfileSerializer
+
 
 def pass_judgement_profile(profile_id, suggested_match_id, judgement):
     suggested_profile = Profile.objects.get(uuid=suggested_match_id)
@@ -14,11 +16,25 @@ def pass_judgement_profile(profile_id, suggested_match_id, judgement):
     )
     pass_judgement_psychograph(profile_id, psychograph, judgement)
 
+
 def pass_judgement_psychograph(profile_id, psychograph, judgement):
     profile = Profile.objects.get(uuid=profile_id)
-    PsychPreference.objects.create(
+    PsychePreference.objects.create(
         user=profile,
         psychograph=psychograph,
         accepted=judgement,
     )
-        
+
+
+def gen_match(user_id):
+    user = User.objects.get(id=user_id)
+    profile = Profile.objects.get(user=user)
+    profile_json = ProfileSerializer(profile).data
+    return profile_json
+
+
+def gen_matches(user_id, num_matches):
+    matches = []
+    for i in range(num_matches):
+        matches.append(gen_match(user_id))
+    return matches

@@ -138,9 +138,7 @@ class Team(models.Model):
 
 
 class Availability(models.Model):
-    uuid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     start = models.DateTimeField()
     end = models.DateTimeField()
 
@@ -153,22 +151,31 @@ class Availability(models.Model):
 
 
 class PsychePreference(models.Model):
-    uuid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("Profile", on_delete=models.CASCADE)
     psychograph = models.ForeignKey("Psychograph", on_delete=models.CASCADE)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
     accepted = models.BooleanField(default=False)
 
+    def __str__(self):
+        return '{uname} {accept} t:{tr} j:{jr} s:{sr}'.format(
+            uname=self.user.user.username,
+            accept='accepts' if self.accepted else 'rejects',
+            tr=self.psychograph.timmy_rank,
+            jr=self.psychograph.johnny_rank,
+            sr=self.psychograph.spike_rank,
+        )
+
 
 class Psychograph(models.Model):
-    uuid = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
     johnny_rank = models.IntegerField(default=0)
     spike_rank = models.IntegerField(default=0)
     timmy_rank = models.IntegerField(default=0)
+    calibrator = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('johnny_rank', 'timmy_rank', 'spike_rank')
