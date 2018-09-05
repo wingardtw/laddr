@@ -179,3 +179,21 @@ class Psychograph(models.Model):
 
     class Meta:
         unique_together = ('johnny_rank', 'timmy_rank', 'spike_rank')
+
+
+class Match(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    player_a = models.ForeignKey(
+        "Profile",
+        on_delete=models.CASCADE,
+        related_name='player_a',
+    )
+    player_b = models.ForeignKey(
+        "Profile",
+        on_delete=models.CASCADE,
+        related_name='player_b',
+    )
+    player_a_accept = models.BooleanField(default=False)
+    player_b_accept = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
