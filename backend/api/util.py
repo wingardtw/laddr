@@ -26,15 +26,15 @@ def pass_judgement_psychograph(profile_id, psychograph, judgement):
     )
 
 
-def gen_match(user_id):
+def gen_new_match(user_id):
     user = User.objects.get(id=user_id)
     profile = Profile.objects.get(user=user)
     profile_json = ProfileSerializer(profile).data
     return profile_json
 
 
-def gen_matches(user_id, num_matches):
+def gen_new_matches(user_id, num_matches):
     matches = []
     for i in range(num_matches):
-        matches.append(gen_match(user_id))
+        matches.append(gen_new_match(user_id))
     return matches

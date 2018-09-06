@@ -1,12 +1,14 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 from api.models import (
+    Availability,
+    Match,
     Membership,
     Profile,
-    Team,
-    Availability,
     PsychePreference,
     Psychograph,
+    Team,
 )
 
 
@@ -124,6 +126,30 @@ class PsychePreferenceSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'accepted'
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Match.objects.all(),
+                fields=('player_a', 'player_b'),
+            )
+        ]
+        fields = (
+            'uuid',
+            'player_a',
+            'player_b',
+            'player_a_accept',
+            'player_b_accept',
+            'created_at',
+            'updated_at',
         )
         read_only_fields = (
             'created_at',

@@ -11,11 +11,16 @@ router.register(r"teams", views.TeamViewSet)
 router.register(r"availability", views.AvailabilityViewSet)
 router.register(r"psychepreferences", views.PsychePreferenceViewSet)
 router.register(r"psychographs", views.PsychographViewSet)
+router.register(r"matches", views.MatchViewSet)
 
-app_name = 'api'
+app_name = "api"
 urlpatterns = [
     path("", include(router.urls)),
-    url(r'^auth$', drf_views.obtain_auth_token, name='auth'),
-    url(r'^calibrate$', views.calibrate, name='calibrate'),
-    url(r'^get_matches/(?P<user_id>\d+)$', views.get_matches, name='get_matches'),
+    url(r"^auth$", drf_views.obtain_auth_token, name="auth"),
+    url(r"^calibrate$", views.calibrate, name="calibrate"),
+    url(
+        r"^get_new_matches/(?P<user_id>\d+)$",
+        views.get_new_matches,
+        name="get_new_matches",
+    ),
 ]

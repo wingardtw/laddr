@@ -3,8 +3,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import api.serializers as serializers
-from api.models import Profile, Team, Availability, PsychePreference, Psychograph
-from api.util import gen_matches
+from api.models import Availability, Match, Profile, PsychePreference, Psychograph, Team
+from api.util import gen_new_matches
 
 # Create your views here.
 
@@ -43,6 +43,11 @@ class PsychographViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PsychographSerializer
 
 
+class MatchViewSet(viewsets.ModelViewSet):
+    queryset = Match.objects.all()
+    serializer_class = serializers.MatchSerializer
+
+
 @api_view(["GET", "POST"])
 def calibrate(request):
     if request.method == "POST":
@@ -56,9 +61,9 @@ def calibrate(request):
 
 
 @api_view(["GET"])
-def get_matches(request, user_id):
+def get_new_matches(request, user_id):
     if user_id:
-        matches = gen_matches(user_id=user_id, num_matches=5)
-        return Response({'matches': matches})
+        matches = gen_new_matches(user_id=user_id, num_matches=5)
+        return Response({"matches": matches})
     else:
-        return Response({'error': 'No user id supplied'})
+        return Response({"error": "No user id supplied"})
