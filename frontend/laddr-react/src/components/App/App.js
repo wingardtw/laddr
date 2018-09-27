@@ -1,15 +1,21 @@
 import React, { Component } from 'react';
 import './App.css';
-import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
-
+import Main from '../Main/Main';
 
 
 class App extends Component {
+  state = {
+    isLoggedIn:false
+  }
+  handleLogin = ()=> {
+    this.setState(prevState => ({
+      isLoggedIn: !prevState.isLoggedIn
+    }))
+  }
+
   render() {
     return (
-      <div className="App">
-
-      </div>
+      <Main />
     );
   }
 }

@@ -5,8 +5,77 @@
   box-sizing: border-box;
 }
 
+h1,h2,h3,p,ul,li {
+  margin: 0px;
+  padding: 0px;
+}
+
 html, body {
   height: 100%;
   overflow-x: hidden;
+  font-family: sans-serif;
+  color: #333;
+}
+.main {
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 5rem 1fr;
+}
+.header, .container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-column-gap: 1.5rem;
 }
 
+.container {
+  height: 100%;
+  align-items: center;
+}
+
+.nav__link--active {
+  color: red;
+}
+
+.navbar {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px;
+  list-style: none;
+  grid-column: 3/11;
+  align-items: center;
+}
+.navbar__item {
+  margin-left: 1rem;
+}
+
+.navbar__link {text-decoration: none;}
+
+.fontsize2 {font-size: 2.25rem;}
+
+/* buttons */
+.btn--primary {
+  border: none;
+  background: rgb(86, 230, 148);
+  font-weight: 700;
+  letter-spacing: .02rem;
+  padding: .667rem;
+  color: #fff;
+  width: 10rem;
+  border-radius: 4px;
+}
+
+/* landing page */
+.landing__left {
+  grid-column: 3/6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.landing__left > * {margin-bottom: 1rem;}
+
+.landing__right {
+  grid-column: 7/11;
+}
+.landing__copy {
+  line-height: 1.5rem;
+}
