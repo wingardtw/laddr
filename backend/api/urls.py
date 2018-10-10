@@ -23,4 +23,8 @@ urlpatterns = [
         views.get_new_matches,
         name="get_new_matches",
     ),
+    path('profile/<uuid:pk>/',views.ProfileDetail, name="profile"),
+    path('profile/',views.profile_list),
+    path('user/<int:id>/',views.UserDetail, name="user"),
+    path('user/',views.user_list)
 ]

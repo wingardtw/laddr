@@ -19,6 +19,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    #Ending point: Need to figure out how to use the SlugRelatedField. What would this be for us? Something unique...
+    #Do not need to use a SlugRelatedField. Instead, can just force a user to be made before the profile gets made. Just need to make a user view and such. 
+    
+    #user = serializers.SlugRelatedField(
+    #    slug_field='username', queryset=User.objects.all()
+    #)
+    
     class Meta:
         model = Profile
         fields = (
