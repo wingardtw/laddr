@@ -3,7 +3,16 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import api.serializers as serializers
-from api.models import Availability, Match, Profile, PsychePreference, Psychograph, Team
+from api.models import (
+    Availability,
+    Endorsement,
+    Endorsements,
+    Match,
+    Profile,
+    PsychePreference,
+    Psychograph,
+    Team,
+)
 from api.util import gen_new_matches
 
 # Create your views here.
@@ -48,6 +57,16 @@ class MatchViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.MatchSerializer
 
 
+class EndorsementViewSet(viewsets.ModelViewSet):
+    queryset = Endorsement.objects.all()
+    serializer_class = serializers.EndorsementSerializer
+
+
+class EndorsementsViewSet(viewsets.ModelViewSet):
+    queryset = Endorsements.objects.all().order_by('endorsee')
+    serializer_class = serializers.EndorsementsSerializer
+
+
 @api_view(["GET", "POST"])
 def calibrate(request):
     if request.method == "POST":
@@ -67,3 +86,14 @@ def get_new_matches(request, user_id):
         return Response({"matches": matches})
     else:
         return Response({"error": "No user id supplied"})
+
+
+@api_view(["GET"])
+def loading_taglines(request):
+    return Response([
+        "Ganking Mid",
+        "Floating Mana",
+        "Clearing Wraiths",
+        "Stealing Baron",
+        "Raising Dongers",
+    ])

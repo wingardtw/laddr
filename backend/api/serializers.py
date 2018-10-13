@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 from api.models import (
     Availability,
+    Endorsement,
+    Endorsements,
     Match,
     Membership,
     Profile,
@@ -38,6 +39,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'preferred_johnny_rank',
             'preferred_timmy_rank',
             'preferred_spike_rank',
+            'endorsements',
         )
         read_only_fields = (
             'num_profiles_ranked',
@@ -136,12 +138,6 @@ class PsychePreferenceSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Match.objects.all(),
-                fields=('player_a', 'player_b'),
-            )
-        ]
         fields = (
             'uuid',
             'player_a',
@@ -155,3 +151,65 @@ class MatchSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
         )
+
+
+class EndorsementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endorsement
+        fields = (
+            'uuid',
+            'skill',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
+class EndorsementsSerializer(serializers.ModelSerializer):
+    endorsee = ProfileSerializer(read_only=True)
+    endorser = ProfileSerializer(read_only=True)
+    skill = EndorsementSerializer(read_only=True)
+    wendorsee = serializers.PrimaryKeyRelatedField(
+        source='endorsee',
+        queryset=Profile.objects.all(),
+    )
+    wendorser = serializers.PrimaryKeyRelatedField(
+        source='endorser',
+        queryset=Profile.objects.all(),
+    )
+    wendorsement = serializers.PrimaryKeyRelatedField(
+        source='endorsement',
+        queryset=Endorsement.objects.all()
+    )
+
+    def validate(self, data):
+        print(data)
+        if data.get('endorser') == data.get('endorsee'):
+            raise serializers.ValidationError("Cannot endorse yourself")
+        return data
+
+    class Meta:
+        model = Endorsements
+        fields = (
+            'uuid',
+            'endorsee',
+            'endorser',
+            'skill',
+            'wendorsee',
+            'wendorser',
+            'wendorsement',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+        extra_kwargs = {
+            'wendorsee': {'write_only': True},
+            'wendorser': {'write_only': True},
+            'wendorsement': {'write_only': True},
+        }

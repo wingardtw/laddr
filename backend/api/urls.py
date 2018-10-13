@@ -12,6 +12,8 @@ router.register(r"availability", views.AvailabilityViewSet)
 router.register(r"psychepreferences", views.PsychePreferenceViewSet)
 router.register(r"psychographs", views.PsychographViewSet)
 router.register(r"matches", views.MatchViewSet)
+router.register(r"endorsement", views.EndorsementViewSet)
+router.register(r"endorsements", views.EndorsementsViewSet)
 
 app_name = "api"
 urlpatterns = [
@@ -23,4 +25,5 @@ urlpatterns = [
         views.get_new_matches,
         name="get_new_matches",
     ),
+    path("loading_taglines", views.loading_taglines),
 ]

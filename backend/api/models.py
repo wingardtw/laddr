@@ -101,6 +101,14 @@ class Profile(models.Model):
     preferred_spike_rank = models.IntegerField(default=0)
     preferred_timmy_rank = models.IntegerField(default=0)
     num_profiles_ranked = models.IntegerField(default=0)
+    endorsements = models.ManyToManyField(
+        "Endorsement",
+        through="Endorsements",
+        through_fields=(
+            'endorsee',
+            'endorsement'
+        )
+    )
 
     def __str__(self):
         return self.user.username
@@ -197,3 +205,33 @@ class Match(models.Model):
     player_b_accept = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class Endorsement(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    skill = models.CharField(max_length=20, blank=False, null=False, unique=True)
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.skill
+
+
+class Endorsements(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    endorsement = models.ForeignKey("Endorsement", on_delete=models.CASCADE)
+    endorser = models.ForeignKey(
+        "Profile",
+        related_name="endorser",
+        on_delete=models.CASCADE
+    )
+    endorsee = models.ForeignKey(
+        "Profile",
+        related_name="endorsee",
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(default=now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('endorser', 'endorsee', 'endorsement')
