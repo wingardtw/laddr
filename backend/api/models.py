@@ -70,6 +70,7 @@ class Profile(models.Model):
     playstyle = models.CharField(
         max_length=40, choices=PLAYSTYLES, default="Conservative"
     )
+    goal = models.TextField(max_length=200, blank=True, null=False)
     top_champions = JSONField(
         default={"First": None, "Second": None, "Third": None}
     )
