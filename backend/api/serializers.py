@@ -172,15 +172,15 @@ class EndorsementsSerializer(serializers.ModelSerializer):
     endorsee = ProfileSerializer(read_only=True)
     endorser = ProfileSerializer(read_only=True)
     skill = EndorsementSerializer(read_only=True)
-    wendorsee = serializers.PrimaryKeyRelatedField(
+    endorsee_ = serializers.PrimaryKeyRelatedField(
         source='endorsee',
         queryset=Profile.objects.all(),
     )
-    wendorser = serializers.PrimaryKeyRelatedField(
+    endorser_ = serializers.PrimaryKeyRelatedField(
         source='endorser',
         queryset=Profile.objects.all(),
     )
-    wendorsement = serializers.PrimaryKeyRelatedField(
+    endorsement_ = serializers.PrimaryKeyRelatedField(
         source='endorsement',
         queryset=Endorsement.objects.all()
     )
@@ -198,9 +198,9 @@ class EndorsementsSerializer(serializers.ModelSerializer):
             'endorsee',
             'endorser',
             'skill',
-            'wendorsee',
-            'wendorser',
-            'wendorsement',
+            'endorsee_',
+            'endorser_',
+            'endorsement_',
             'created_at',
             'updated_at',
         )
@@ -209,7 +209,7 @@ class EndorsementsSerializer(serializers.ModelSerializer):
             'updated_at',
         )
         extra_kwargs = {
-            'wendorsee': {'write_only': True},
-            'wendorser': {'write_only': True},
-            'wendorsement': {'write_only': True},
+            'endorsee_': {'write_only': True},
+            'endorser_': {'write_only': True},
+            'endorsement_': {'write_only': True},
         }
