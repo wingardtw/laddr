@@ -1,10 +1,17 @@
 import random
+
 from api.models import *
 from django.contrib.auth.models import User
 from api.timezones import TIMEZONE_CHOICES
 
 ##faker import to generate fake data.
 from faker import Faker
+
+import csv
+with open(r'C:\Users\Jacob\Documents\LaddrBase\laddr\backend\api\LolDuoCsv.csv','r') as f:
+    reader = csv.reader(f)
+    bios = list(reader)
+
 
 ##First, define the fakegen function to generate the fake data.
 fakegen =Faker()
@@ -31,7 +38,7 @@ def populate_test_users(N=10):
         fake_tz=random.choice(timezones)[0]
         fake_ps=random.choice(playstyles)[0]
         fake_fc=fakegen.safe_color_name()
-        fake_bio=fakegen.sentence()
+        fake_bio = bios[entry]
         fake_role=random.choice(role)[0]
         fake_rank=random.choice(rank)[0]
         fake_jr=random.randint(0,101)
