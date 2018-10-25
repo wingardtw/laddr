@@ -5,7 +5,6 @@ from api.timezones import TIMEZONE_CHOICES
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 
-
 # faker import to generate fake data.
 from faker import Faker
 
@@ -18,21 +17,15 @@ with open(
     bios = list(reader)
 
 
-# First, define the fakegen function to generate the fake data.
-fakegen = Faker()
-
-# Then, we define our arrays of timezones, playstyles, roles, and ranks.
-# timezones = ['PST','MST','CST','EST']
-timezones = TIMEZONE_CHOICES
-# playstyles =['Conservative','Competitive','Casual']
-playstyles = PLAYSTYLES
-role = ROLES
-rank = RANKS
-
-
 # The function to generate test users. Will generate 5x
 # the number supplied (by default this is 10)
 def populate_test_users(N=10):
+    fakegen = Faker()
+    playstyles = PLAYSTYLES
+    rank = RANKS
+    role = ROLES
+    timezones = TIMEZONE_CHOICES
+
     for entry in range(N * 5):
         uname = "Test_User_{0}".format(entry)
         if len(User.objects.filter(username=uname)) > 0:
