@@ -20,15 +20,16 @@ class Home extends Component {
                         </div>
                     </div>
                     <div className="home__next_game">
-                        <p>next game:</p>
-                        <p>54 minutes with Lorem</p>
+                        <p className="home__next_game__title">next game:</p>
+                        <p className="home__next_game__copy">54 minutes with Lorem</p>
                     </div>
                     <div className="home__cta">
                         <p className="home__cta__copy">
                             Need a new duo partner?
                         </p>
-                        <button className="home__cta__btn">TEAM UP</button>
+                        <button className="home__cta__btn btn--primary">TEAM UP</button>
                     </div>
+                    <div className="test"></div>
                 </PageContent>
             </Page>
         )
