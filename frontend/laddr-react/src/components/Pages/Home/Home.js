@@ -10,6 +10,7 @@ class Home extends Component {
                 subtitle="this is the home dashboard">
                 <PageContent>
                     <div className="home__news">
+                        <div className="home__news__item"></div>
                         <h2 className="home__news__title">This is news on the homepage</h2>
                     </div>
                     <div className="home__activity">
@@ -18,12 +19,15 @@ class Home extends Component {
                             this is stuff
                         </div>
                     </div>
-                    <div className="home__next_game">stuff</div>
+                    <div className="home__next_game">
+                        <p>next game:</p>
+                        <p>54 minutes with Lorem</p>
+                    </div>
                     <div className="home__cta">
                         <p className="home__cta__copy">
-                            Looking for a new team?
+                            Need a new duo partner?
                         </p>
-                        <button className="home__cta__btn">Find players</button>
+                        <button className="home__cta__btn">TEAM UP</button>
                     </div>
                 </PageContent>
             </Page>
