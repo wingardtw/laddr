@@ -1,20 +1,25 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from api.models import (
+    Availability,
+    Endorsement,
+    Endorsements,
+    Match,
     Membership,
     Profile,
+    PsychePreference,
+    Psychograph,
     Team,
-    Availability,
-    PsychePreference
 )
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ('id', 'username', 'email', 'groups')
+
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
     class Meta:
         model = Profile
         fields = (
@@ -27,13 +32,19 @@ class ProfileSerializer(serializers.ModelSerializer):
             'role',
             'rank',
             'is_real',
+            'num_profiles_ranked',
             'johnny_rank',
             'timmy_rank',
             'spike_rank',
             'preferred_johnny_rank',
             'preferred_timmy_rank',
             'preferred_spike_rank',
+            'endorsements',
         )
+        read_only_fields = (
+            'num_profiles_ranked',
+        )
+
 
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,8 +54,8 @@ class MembershipSerializer(serializers.ModelSerializer):
             'date_joined',
         )
 
+
 class TeamSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
     class Meta:
         model = Team
         fields = (
@@ -54,6 +65,10 @@ class TeamSerializer(serializers.ModelSerializer):
             'created_at',
             'is_real',
         )
+        read_only_fields = (
+            'created_at',
+        )
+
 
 class AvailabilitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,17 +79,137 @@ class AvailabilitySerializer(serializers.ModelSerializer):
             'end'
         )
 
+
+class ProfilePsycheSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = (
+            'user',
+            'num_profiles_ranked',
+            'johnny_rank',
+            'timmy_rank',
+            'spike_rank',
+        )
+        read_only_fields = (
+            'num_profiles_ranked',
+            'timmy_rank',
+            'johnny_rank',
+            'spike_rank',
+        )
+
+
+class PsychographSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Psychograph
+        fields = (
+            'uuid',
+            'created_at',
+            'updated_at',
+            'timmy_rank',
+            'johnny_rank',
+            'spike_rank',
+            'calibrator',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
 class PsychePreferenceSerializer(serializers.ModelSerializer):
-    created_at = serializers.DateTimeField(read_only=True)
-    updated_at = serializers.DateTimeField(read_only=True)
+    psychograph = PsychographSerializer()
+
     class Meta:
         model = PsychePreference
         fields = (
             'uuid',
             'user',
-            'potential_match',
+            'psychograph',
             'created_at',
             'updated_at',
             'accepted'
         )
-        
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = (
+            'uuid',
+            'player_a',
+            'player_b',
+            'player_a_accept',
+            'player_b_accept',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
+class EndorsementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Endorsement
+        fields = (
+            'uuid',
+            'skill',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+
+
+class EndorsementsSerializer(serializers.ModelSerializer):
+    endorsee = ProfileSerializer(read_only=True)
+    endorser = ProfileSerializer(read_only=True)
+    skill = EndorsementSerializer(read_only=True)
+    endorsee_ = serializers.PrimaryKeyRelatedField(
+        source='endorsee',
+        queryset=Profile.objects.all(),
+    )
+    endorser_ = serializers.PrimaryKeyRelatedField(
+        source='endorser',
+        queryset=Profile.objects.all(),
+    )
+    endorsement_ = serializers.PrimaryKeyRelatedField(
+        source='endorsement',
+        queryset=Endorsement.objects.all()
+    )
+
+    def validate(self, data):
+        print(data)
+        if data.get('endorser') == data.get('endorsee'):
+            raise serializers.ValidationError("Cannot endorse yourself")
+        return data
+
+    class Meta:
+        model = Endorsements
+        fields = (
+            'uuid',
+            'endorsee',
+            'endorser',
+            'skill',
+            'endorsee_',
+            'endorser_',
+            'endorsement_',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+        )
+        extra_kwargs = {
+            'endorsee_': {'write_only': True},
+            'endorser_': {'write_only': True},
+            'endorsement_': {'write_only': True},
+        }
