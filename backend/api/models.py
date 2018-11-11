@@ -204,8 +204,15 @@ class Match(models.Model):
     )
     player_a_accept = models.BooleanField(default=False)
     player_b_accept = models.BooleanField(default=False)
+    primary_reason = models.TextField(max_length=200, blank=False, null=True)
+    secondary_reason = models.TextField(max_length=200, blank=False, null=True)
+    tertiary_reason = models.TextField(max_length=200, blank=False, null=True)
+
+    # Metadata
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
+    player_a_accept_at = models.DateTimeField(auto_now=True)
+    player_b_accept_at = models.DateTimeField(auto_now=True)
 
 
 class Endorsement(models.Model):
