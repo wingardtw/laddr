@@ -3,6 +3,48 @@ import Page from "../Page";
 import PageContent from "../PageContent";
 import PlayerCard from "./PlayerCard";
 
+const players = [
+  {
+    id: 1,
+    username: "Lorem",
+    rank: "Gold IV",
+    role: "top",
+    region: "NA",
+    language: "EN",
+    goal: "this is a story all about how"
+  },
+  {
+    id: 2,
+    username: "Ipsum",
+    rank: "Gold IV",
+    role: "top",
+    region: "NA",
+    language: "EN",
+    goal: "this is a story all about how"
+  },
+  {
+    id: 3,
+    username: "Dolor",
+    rank: "Gold IV",
+    role: "top",
+    region: "NA",
+    language: "EN",
+    goal: "this is a story all about how"
+  }
+];
+
+const listPlayers = players.map(player => (
+  <PlayerCard
+    key={player.id}
+    username={player.username}
+    rank={player.rank}
+    role={player.role}
+    region={player.region}
+    language={player.language}
+    goal={player.goal}
+  />
+));
+
 class FindPlayers extends Component {
   render() {
     return (
@@ -19,32 +61,7 @@ class FindPlayers extends Component {
               </ul>
             </div>
           </div>
-          <div className="matches__container">
-            <PlayerCard
-              username="Lorem"
-              rank="Gold IV"
-              role="top"
-              region="NA"
-              language="EN"
-              goal="this is a story all about how"
-            />
-            <PlayerCard
-              username="Ipsum"
-              rank="Gold IV"
-              role="top"
-              region="NA"
-              language="EN"
-              goal="this is a story all about how"
-            />
-            <PlayerCard
-              username="Dolor"
-              rank="Gold IV"
-              role="top"
-              region="NA"
-              language="EN"
-              goal="this is a story all about how"
-            />
-          </div>
+          <div className="matches__container">{listPlayers}</div>
         </PageContent>
       </Page>
     );
