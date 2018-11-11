@@ -1,6 +1,15 @@
 import React, { Component } from "react";
 
 class PlayerCard extends Component {
+  state = {
+    count: 1,
+    username: this.props.username
+  };
+
+  handleClick = () => {
+    console.log("you have selected " + this.props.username);
+  };
+
   render() {
     return (
       <div className="matches__card">
@@ -17,7 +26,9 @@ class PlayerCard extends Component {
           </ul>
         </div>
         <div className="matches__card__cta">
-          <button className="btn--primary">Select {this.props.username}</button>
+          <button className="btn--primary" onClick={this.handleClick}>
+            Select {this.props.username}
+          </button>
         </div>
       </div>
     );

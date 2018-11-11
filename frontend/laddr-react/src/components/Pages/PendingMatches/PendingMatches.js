@@ -5,6 +5,10 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import PendingTabPanels from "./PendingTabPanels";
 
 class PendingMatches extends Component {
+  state = {
+    received: [1, 2, 3],
+    sent: [4, 5, 6]
+  };
   render() {
     return (
       <Page title="Pending Matches" subtitle="showing your pending matches">
@@ -15,10 +19,10 @@ class PendingMatches extends Component {
               <Tab>Sent</Tab>
             </TabList>
             <TabPanel>
-              <PendingTabPanels />
+              <PendingTabPanels matches={this.state.received} />
             </TabPanel>
             <TabPanel>
-              <h2>Sent</h2>
+              <PendingTabPanels matches={this.state.sent} />
             </TabPanel>
           </Tabs>
         </PageContent>
