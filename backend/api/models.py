@@ -6,9 +6,15 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.timezone import now
+
 import uuid
+import datetime
 
 # Create your models here.
+
+# Default duration in days
+DEFAULT_MATCH_DURATION = 24
+DEFAULT_MATCH_EXPIRE = now() + datetime.timedelta(days=DEFAULT_MATCH_DURATION)
 
 LOL_SERVERS = (("NA", "North America"),)
 
@@ -25,6 +31,7 @@ ROLES = (
     ("Mid", "Mid"),
     ("Top", "Top"),
 )
+
 RANKS = (
     ("Bronze V", "Bronze V"),
     ("Bronze IV", "Bronze IV"),
@@ -190,29 +197,76 @@ class Psychograph(models.Model):
         unique_together = ('johnny_rank', 'timmy_rank', 'spike_rank')
 
 
-class Match(models.Model):
+class Connection(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     player_a = models.ForeignKey(
         "Profile",
         on_delete=models.CASCADE,
-        related_name='player_a',
+        related_name='%(app_label)s_%(class)s_player_a',
     )
     player_b = models.ForeignKey(
         "Profile",
         on_delete=models.CASCADE,
-        related_name='player_b',
+        related_name='%(app_label)s_%(class)s_player_b',
     )
-    player_a_accept = models.BooleanField(default=False)
-    player_b_accept = models.BooleanField(default=False)
-    primary_reason = models.TextField(max_length=200, blank=False, null=True)
-    secondary_reason = models.TextField(max_length=200, blank=False, null=True)
-    tertiary_reason = models.TextField(max_length=200, blank=False, null=True)
 
     # Metadata
     created_at = models.DateTimeField(default=now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class Match(Connection):
+    player_a_accept = models.BooleanField(default=False)
+    player_b_accept = models.BooleanField(default=False)
+    primary_reason = models.TextField(
+        max_length=200,
+        blank=False,
+        null=True,
+        default=None
+    )
+    secondary_reason = models.TextField(
+        max_length=200,
+        blank=False,
+        null=True,
+        default=None
+    )
+    tertiary_reason = models.TextField(
+        max_length=200,
+        blank=False,
+        null=True,
+        default=None
+    )
+
+    # Metadata
     player_a_accept_at = models.DateTimeField(auto_now=True)
     player_b_accept_at = models.DateTimeField(auto_now=True)
+    expired = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(default=DEFAULT_MATCH_EXPIRE)
+
+    def __str__(self):
+        return "Match between {} and {}".format(
+            self.player_a.user.username, self.player_b.user.username
+        )
+
+
+class DuoPartner(Connection):
+    player_a_feedback = models.TextField(
+        max_length=500,
+        blank=False,
+        null=True,
+        default=None
+    )
+    player_b_feedback = models.TextField(
+        max_length=500,
+        blank=False,
+        null=True,
+        default=None
+    )
+    player_a_rating = models.IntegerField(null=True, default=None)
+    player_b_rating = models.IntegerField(null=True, default=None)
 
 
 class Endorsement(models.Model):
