@@ -1,22 +1,40 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600');
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600");
 
-*,* {
+*,
+* {
   box-sizing: border-box;
 }
 
-#root {height: 100%; min-height: 0px;}
+#root {
+  height: 100%;
+  min-height: 0px;
+}
 
-h1,h2,h3,p,ul,li,a {
+h1,
+h2,
+h3,
+p,
+ul,
+li,
+a {
   margin: 0px;
   padding: 0px;
   list-style-type: none;
   text-decoration: none;
 }
 
-h1 {font-size: 2.25rem; font-weight: 600;}
-p,li,a {line-height: 1.5rem;}
+h1 {
+  font-size: 2.25rem;
+  font-weight: 600;
+}
+p,
+li,
+a {
+  line-height: 1.5rem;
+}
 
-html, body {
+html,
+body {
   height: 100%;
   min-height: 0px;
   overflow-x: hidden;
@@ -24,9 +42,10 @@ html, body {
   color: #333;
 }
 
-
 @media screen and (min-width: 600px) {
-  :root { font-size: 20px;}
+  :root {
+    font-size: 16px;
+  }
   .app {
     min-height: 0px;
     height: 100%;
@@ -40,7 +59,9 @@ html, body {
     grid-column-gap: 1.5rem;
     padding-right: 1.5rem;
   }
-  .container > * {padding-top: 1.5rem;}
+  .container > * {
+    padding-top: 1.5rem;
+  }
   .page__searchbar {
     grid-column: 11/13;
     grid-row: 1;
@@ -58,8 +79,8 @@ html, body {
   }
   .searchbar {
     border-radius: 4px;
-    border: 1px solid rgba(0,0,0,.18);
-    padding: .444rem 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    padding: 0.444rem 1rem;
     width: 100%;
   }
   .page__stage {
@@ -67,7 +88,7 @@ html, body {
     grid-row: 1;
     display: flex;
     flex-direction: column;
-    border-top: 4px solid #37A2ff;
+    border-top: 4px solid #37a2ff;
   }
   .page__header {
     margin-bottom: 1.5rem;
@@ -81,11 +102,13 @@ html, body {
     padding-bottom: 1.5rem;
   }
 
-  .home__news, .home__activity {
+  .home__news,
+  .home__activity {
     display: flex;
     flex-direction: column;
   }
-  .home__news__title, .home__activity__title {
+  .home__news__title,
+  .home__activity__title {
     background: #e9e9e9;
     padding: 1.5rem;
   }
@@ -97,7 +120,10 @@ html, body {
     grid-row: 4/-1;
     grid-column: 1/5;
   }
-  .home__activity__area, .home__news__item, .home__cta, .home__next_game {
+  .home__activity__area,
+  .home__news__item,
+  .home__cta,
+  .home__next_game {
     background: #e9e9e9;
     padding: 1.5rem;
     flex: 1;
@@ -127,19 +153,22 @@ html, body {
     grid-row: 1/9;
   }
   .matches__container {
-    grid-column: 2/11;
+    grid-column: 2/10;
     grid-row: 1/9;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-column-gap: 1.5rem;
   }
-  .matches__card, .matches__attributes {
+  .matches__card,
+  .matches__attributes {
     display: grid;
     grid-template-rows: repeat(8, 1fr);
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
   .matches__card {
     background: #e9e9e9;
+    border-radius: 4px;
+    height: 100%;
   }
 
   .matches__card .matches__card__info {
@@ -155,7 +184,7 @@ html, body {
     grid-row: 3/4;
     z-index: 2;
     background: #e9e9e9;
-    opacity: .5;
+    opacity: 0.5;
   }
 
   .matches__card__info {
@@ -176,7 +205,7 @@ html, body {
   }
 
   .matches__card__attribute {
-    font-size: .666rem;
+    font-size: 0.666rem;
   }
   .matches__card__attributes--side {
     text-align: end;
@@ -184,12 +213,56 @@ html, body {
 
   .btn--primary {
     width: 50%;
-    padding: .444rem;
+    padding: 0.444rem;
     border: 0px;
-    background: #37A2ff;
+    background: #37a2ff;
     color: #fff;
-    text-shadow: 1px solid rgba(0,0,0,.18);
+    text-shadow: 1px solid rgba(0, 0, 0, 0.18);
     font-size: 16px;
     border-radius: 4px;
+  }
+
+  .pending_tab_panels {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-gap: 1.5rem;
+    height: 100%;
+  }
+
+  .pending_tab__entries {
+    grid-column: 1/5;
+  }
+  .pending_tab__request {
+    grid-column: 5/8;
+  }
+  .pending_tab__player_card {
+    grid-column: 8/11;
+  }
+
+  /* Tabs */
+  .react-tabs {
+    grid-row: 1/9;
+    grid-column: 1/11;
+  }
+  .react-tabs__tab-list {
+    display: grid;
+    grid-template-columns: repeat(2, 8rem);
+  }
+  .react-tabs__tab-list > * {
+    background: #e9e9e9;
+    padding: 0.666rem 1.5rem;
+    border-radius: 4px 4px 0px 0px;
+    text-align: center;
+  }
+  .react-tabs__tab--selected {
+    background: #f9f9f9;
+  }
+  .react-tabs__tab-panel {
+    background: #f9f9f9;
+    width: 100%;
+    height: calc(100% - 3rem);
+  }
+  .react-tabs > .react-tabs__tab-panel:not(.react-tabs__tab-panel--selected) {
+    display: none;
   }
 }
