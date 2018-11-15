@@ -1,4 +1,4 @@
-from api.models import Profile, Match
+from api.models import Profile, LaddrMatch
 from django.db.models import Q
 
 
@@ -7,7 +7,7 @@ def exclude_matches(profile):
         @profile - api.models.Profile to be matched
         Profiles are excluded if they are in an existing match with given profile
     """
-    matches = Match.objects.filter(Q(player_a=profile) | Q(player_b=profile))
+    matches = LaddrMatch.objects.filter(Q(player_a=profile) | Q(player_b=profile))
     matched_ids = [
         *[x.player_a.uuid for x in matches],  # noqa: E999
         *[x.player_b.uuid for x in matches],
@@ -30,7 +30,7 @@ def find_match_tier_2(profile):
     """
     matched_ids = exclude_matches(profile)
     profiles = Profile.objects.exclude(uuid__in=matched_ids)
-    # Match based on goal similarity
+    # LaddrMatch based on goal similarity
 
 
 def find_match_tier_3(profile):
@@ -39,7 +39,7 @@ def find_match_tier_3(profile):
     """
     matched_ids = exclude_matches(profile)
     profiles = Profile.objects.exclude(uuid__in=matched_ids)
-    # Match based on calibration
+    # LaddrMatch based on calibration
     x = [*['1'], *['2']]
 
 
@@ -49,4 +49,4 @@ def find_match_tier_4(profile):
     """
     matched_ids = exclude_matches(profile)
     profiles = Profile.objects.exclude(uuid__in=matched_ids)
-    # Match based on profile similarity
+    # LaddrMatch based on profile similarity

@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
-from .settings_local import DATABASES
+from .settings_local import DATABASES  # noqa: F401
+
+import datetime
+from django.utils import timezone
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,6 +54,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'drf_utils.exception_handler',
+}
 
 ROOT_URLCONF = 'backend.urls'
 
@@ -110,3 +117,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Default duration in days
+DEFAULT_MATCH_DURATION = 24
+DEFAULT_MATCH_EXPIRE = timezone.now() + datetime.timedelta(days=DEFAULT_MATCH_DURATION)

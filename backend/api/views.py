@@ -7,13 +7,12 @@ from api.models import (
     Availability,
     Endorsement,
     Endorsements,
-    Match,
+    LaddrMatch,
     Profile,
     PsychePreference,
     Psychograph,
     Team,
 )
-from api.util import gen_new_matches
 
 # Create your views here.
 
@@ -52,9 +51,9 @@ class PsychographViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PsychographSerializer
 
 
-class MatchViewSet(viewsets.ModelViewSet):
-    queryset = Match.objects.all()
-    serializer_class = serializers.MatchSerializer
+class LaddrMatchViewSet(viewsets.ModelViewSet):
+    queryset = LaddrMatch.objects.all()
+    serializer_class = serializers.LaddrMatchSerializer
 
 
 class EndorsementViewSet(viewsets.ModelViewSet):
@@ -77,15 +76,6 @@ def calibrate(request):
         psychographs = Psychograph.objects.filter(calibrator=True)
         data = [serializers.PsychographSerializer(ps).data for ps in psychographs]
         return Response({"psychographs": data})
-
-
-@api_view(["GET"])
-def get_new_matches(request, user_id):
-    if user_id:
-        matches = gen_new_matches(user_id=user_id, num_matches=5)
-        return Response({"matches": matches})
-    else:
-        return Response({"error": "No user id supplied"})
 
 
 @api_view(["GET"])

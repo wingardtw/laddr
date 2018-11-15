@@ -2,64 +2,25 @@
 from __future__ import unicode_literals
 
 from .timezones import TIMEZONE_CHOICES
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.utils.timezone import now
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+
+from backend.settings import DEFAULT_MATCH_EXPIRE
+
+from constants import (
+    RANKS,
+    ROLES,
+    SERVERS,
+    PLAYSTYLES,
+)
 
 import uuid
-import datetime
 
 # Create your models here.
-
-# Default duration in days
-DEFAULT_MATCH_DURATION = 24
-DEFAULT_MATCH_EXPIRE = now() + datetime.timedelta(days=DEFAULT_MATCH_DURATION)
-
-LOL_SERVERS = (("NA", "North America"),)
-
-PLAYSTYLES = (
-    ("Aggressive", "Aggressive"),
-    ("Conservative", "Conservative"),
-    ("Supporting", "Supporting"),
-)
-
-ROLES = (
-    ("Bottom", "Bottom"),
-    ("Support", "Support"),
-    ("Jungle", "Jungle"),
-    ("Mid", "Mid"),
-    ("Top", "Top"),
-)
-
-RANKS = (
-    ("Bronze V", "Bronze V"),
-    ("Bronze IV", "Bronze IV"),
-    ("Bronze III", "Bronze III"),
-    ("Bronze II", "Bronze II"),
-    ("Bronze I", "Bronze I"),
-    ("Silver V", "Silver V"),
-    ("Silver IV", "Silver IV"),
-    ("Silver III", "Silver III"),
-    ("Silver II", "Silver II"),
-    ("Silver I", "Silver I"),
-    ("Gold V", "Gold V"),
-    ("Gold IV", "Gold IV"),
-    ("Gold III", "Gold III"),
-    ("Gold II", "Gold II"),
-    ("Gold I", "Gold I"),
-    ("Platinum V", "Platinum V"),
-    ("Platinum IV", "Platinum IV "),
-    ("Platinum III", "Platinum III"),
-    ("Platinum II", "Platinum II"),
-    ("Platinum I", "Platinum I"),
-    ("Diamond V", "Diamond V"),
-    ("Diamond IV", "Diamond IV"),
-    ("Diamond III", "Diamond III"),
-    ("Diamond II", "Diamond II"),
-    ("Diamond I", "Diamond I"),
-    ("Challenger", "Challenger"),
-)
 
 
 class Profile(models.Model):
@@ -67,9 +28,9 @@ class Profile(models.Model):
         primary_key=True, default=uuid.uuid4, editable=False
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    summoner_name = models.CharField(max_length=50, null=True, blank=False)
-    lol_server = models.CharField(
-        max_length=10, blank=False, choices=LOL_SERVERS, default="NA"
+    summoner_name = models.CharField(max_length=50, null=True, blank=True)
+    server = models.CharField(
+        max_length=10, blank=True, choices=SERVERS, default="NA"
     )
     timezones = models.CharField(
         max_length=50, default="Etc/UTC", choices=TIMEZONE_CHOICES
@@ -81,10 +42,10 @@ class Profile(models.Model):
     top_champions = JSONField(
         default={"First": None, "Second": None, "Third": None}
     )
-    favorite_color = models.CharField(max_length=15, blank=False, null=True)
+    favorite_color = models.CharField(max_length=15, blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True, null=False)
     role = models.CharField(
-        max_length=15, choices=ROLES, null=True, blank=False
+        max_length=15, choices=ROLES, null=True, blank=True
     )
     availability = JSONField(
         default={
@@ -98,7 +59,7 @@ class Profile(models.Model):
         }
     )
     rank = models.CharField(
-        max_length=15, choices=RANKS, blank=False, null=True
+        max_length=15, choices=RANKS, blank=True, null=True
     )
     is_real = models.BooleanField(default=True)
 
@@ -170,7 +131,7 @@ class PsychePreference(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey("Profile", on_delete=models.CASCADE)
     psychograph = models.ForeignKey("Psychograph", on_delete=models.CASCADE)
-    created_at = models.DateTimeField(default=now)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     accepted = models.BooleanField(default=False)
 
@@ -186,7 +147,7 @@ class PsychePreference(models.Model):
 
 class Psychograph(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_at = models.DateTimeField(default=now)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
     johnny_rank = models.IntegerField(default=0)
     spike_rank = models.IntegerField(default=0)
@@ -211,38 +172,84 @@ class Connection(models.Model):
     )
 
     # Metadata
-    created_at = models.DateTimeField(default=now)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         abstract = True
 
+    def save(self, *args, **kwargs):
+        if self.player_a == self.player_b:
+            raise ValidationError("Cannot connect with self")
+        super(Connection, self).save(*args, **kwargs)
 
-class Match(Connection):
+
+class UserMatch(models.Model):
+    """"User initiated matches"""
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='match_requests_sent'
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='match_requests_received'
+    )
+
+    message = models.TextField(_('Message'), blank=True)
+
+    rejected_at = models.DateTimeField(blank=True, null=True)
+    viewed_at = models.DateTimeField(blank=True, null=True)
+    expired = models.BooleanField(default=False)
+    expires_at = models.DateTimeField(default=DEFAULT_MATCH_EXPIRE)
+
+    class Meta:
+        verbose_name = _('User Match Request')
+        verbose_name_plural = _('User Match Requests')
+        unique_together = ('from_user', 'to_user')
+
+    def __str__(self):
+        return "%s" % self.from_user_id
+
+    def save(self, *args, **kwargs):
+        if self.player_a == self.player_b:
+            raise ValidationError("Cannot request match with self")
+        super(UserMatch, self).save(*args, **kwargs)
+
+
+class LaddrMatch(Connection):
+    """Matches created by Laddr"""
     player_a_accept = models.BooleanField(default=False)
     player_b_accept = models.BooleanField(default=False)
     primary_reason = models.TextField(
         max_length=200,
-        blank=False,
+        blank=True,
         null=True,
         default=None
     )
     secondary_reason = models.TextField(
         max_length=200,
-        blank=False,
+        blank=True,
         null=True,
         default=None
     )
     tertiary_reason = models.TextField(
         max_length=200,
-        blank=False,
+        blank=True,
         null=True,
         default=None
     )
 
     # Metadata
     player_a_accept_at = models.DateTimeField(auto_now=True)
+    player_a_rejected_at = models.DateTimeField(blank=True, null=True)
+    player_a_viewed_at = models.DateTimeField(blank=True, null=True)
+
     player_b_accept_at = models.DateTimeField(auto_now=True)
+    player_b_rejected_at = models.DateTimeField(blank=True, null=True)
+    player_b_viewed_at = models.DateTimeField(blank=True, null=True)
+
     expired = models.BooleanField(default=False)
     expires_at = models.DateTimeField(default=DEFAULT_MATCH_EXPIRE)
 
@@ -251,28 +258,45 @@ class Match(Connection):
             self.player_a.user.username, self.player_b.user.username
         )
 
+    def save(self, *args, **kwargs):
+        if self.player_a == self.player_b:
+            raise ValidationError("Players cannot match themselves")
+        super(Endorsements, self).save(*args, **kwargs)
+
 
 class DuoPartner(Connection):
+    """Accepted matches"""
     player_a_feedback = models.TextField(
         max_length=500,
-        blank=False,
+        blank=True,
         null=True,
         default=None
     )
     player_b_feedback = models.TextField(
         max_length=500,
-        blank=False,
+        blank=True,
         null=True,
         default=None
     )
     player_a_rating = models.IntegerField(null=True, default=None)
     player_b_rating = models.IntegerField(null=True, default=None)
+    suggested_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )  # If laddr suggested, this should be admin
+
+    def __str__(self):
+        return "Duo pair between {} and {}".format(
+            self.player_a.user.username, self.player_b.user.username
+        )
 
 
 class Endorsement(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    skill = models.CharField(max_length=20, blank=False, null=False, unique=True)
-    created_at = models.DateTimeField(default=now)
+    skill = models.CharField(max_length=20, blank=True, null=False, unique=True)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -292,8 +316,13 @@ class Endorsements(models.Model):
         related_name="endorsee",
         on_delete=models.CASCADE
     )
-    created_at = models.DateTimeField(default=now)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('endorser', 'endorsee', 'endorsement')
+
+    def save(self, *args, **kwargs):
+        if self.endorser == self.endorsee:
+            raise ValidationError("Cannot endorse self")
+        super(Endorsements, self).save(*args, **kwargs)

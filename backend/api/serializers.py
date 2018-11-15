@@ -4,7 +4,7 @@ from api.models import (
     Availability,
     Endorsement,
     Endorsements,
-    Match,
+    LaddrMatch,
     Membership,
     Profile,
     PsychePreference,
@@ -135,9 +135,9 @@ class PsychePreferenceSerializer(serializers.ModelSerializer):
         )
 
 
-class MatchSerializer(serializers.ModelSerializer):
+class LaddrMatchSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Match
+        model = LaddrMatch
         fields = (
             'uuid',
             'player_a',
@@ -145,11 +145,9 @@ class MatchSerializer(serializers.ModelSerializer):
             'player_a_accept',
             'player_b_accept',
             'created_at',
-            'updated_at',
         )
         read_only_fields = (
             'created_at',
-            'updated_at',
         )
 
 
@@ -186,7 +184,6 @@ class EndorsementsSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, data):
-        print(data)
         if data.get('endorser') == data.get('endorsee'):
             raise serializers.ValidationError("Cannot endorse yourself")
         return data
