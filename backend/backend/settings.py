@@ -120,4 +120,3 @@ STATIC_URL = '/static/'
 
 # Default duration in days
 DEFAULT_MATCH_DURATION = 24
-DEFAULT_MATCH_EXPIRE = timezone.now() + datetime.timedelta(days=DEFAULT_MATCH_DURATION)

@@ -183,10 +183,10 @@ class EndorsementsSerializer(serializers.ModelSerializer):
         queryset=Endorsement.objects.all()
     )
 
-    def validate(self, data):
-        if data.get('endorser') == data.get('endorsee'):
-            raise serializers.ValidationError("Cannot endorse yourself")
-        return data
+    # def validate(self, data):
+    #     if data.get('endorser') == data.get('endorsee'):
+    #         raise serializers.ValidationError("Cannot endorse yourself")
+    #     return data
 
     class Meta:
         model = Endorsements

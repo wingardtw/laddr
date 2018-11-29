@@ -4,18 +4,18 @@ from __future__ import unicode_literals
 from .timezones import TIMEZONE_CHOICES
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from backend.settings import DEFAULT_MATCH_EXPIRE
+from api.utility import default_match_expire
 
 from constants import (
     RANKS,
     ROLES,
     SERVERS,
     PLAYSTYLES,
+    DOW,
 )
 
 import uuid
@@ -39,25 +39,12 @@ class Profile(models.Model):
         max_length=40, choices=PLAYSTYLES, default="Conservative"
     )
     goal = models.TextField(max_length=200, blank=True, null=False)
-    top_champions = JSONField(
-        default={"First": None, "Second": None, "Third": None}
-    )
     favorite_color = models.CharField(max_length=15, blank=True, null=True)
     bio = models.TextField(max_length=500, blank=True, null=False)
     role = models.CharField(
         max_length=15, choices=ROLES, null=True, blank=True
     )
-    availability = JSONField(
-        default={
-            "Monday": False,
-            "Tuesday": False,
-            "Wednesday": False,
-            "Thursday": False,
-            "Friday": False,
-            "Saturday": False,
-            "Sunday": False,
-        }
-    )
+    availabilities = models.ManyToManyField("Availability")
     rank = models.CharField(
         max_length=15, choices=RANKS, blank=True, null=True
     )
@@ -116,8 +103,11 @@ class Team(models.Model):
 
 class Availability(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    player = models.ForeignKey("Profile", on_delete=models.CASCADE, null=True)
+    day_of_week = models.CharField(max_length=15, choices=DOW, blank=True, null=True)
+    time_of_day = models.TimeField(null=True)
+    duration = models.DurationField(null=True)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
         date_format = "%A %H:%M"
@@ -201,8 +191,6 @@ class UserMatch(models.Model):
 
     rejected_at = models.DateTimeField(blank=True, null=True)
     viewed_at = models.DateTimeField(blank=True, null=True)
-    expired = models.BooleanField(default=False)
-    expires_at = models.DateTimeField(default=DEFAULT_MATCH_EXPIRE)
 
     class Meta:
         verbose_name = _('User Match Request')
@@ -251,7 +239,7 @@ class LaddrMatch(Connection):
     player_b_viewed_at = models.DateTimeField(blank=True, null=True)
 
     expired = models.BooleanField(default=False)
-    expires_at = models.DateTimeField(default=DEFAULT_MATCH_EXPIRE)
+    expires_at = models.DateTimeField(default=default_match_expire)
 
     def __str__(self):
         return "Match between {} and {}".format(
@@ -326,3 +314,17 @@ class Endorsements(models.Model):
         if self.endorser == self.endorsee:
             raise ValidationError("Cannot endorse self")
         super(Endorsements, self).save(*args, **kwargs)
+
+
+class MatchingPreference(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    player = models.ForeignKey("Profile", on_delete=models.CASCADE)
+
+    rank = models.CharField(
+        max_length=15, choices=RANKS, blank=True, null=True
+    )
+    rank_importance = models.IntegerField(default=0)
+    role = models.CharField(
+        max_length=15, choices=ROLES, null=True, blank=True
+    )
+    role_importance = models.IntegerField(default=0)
