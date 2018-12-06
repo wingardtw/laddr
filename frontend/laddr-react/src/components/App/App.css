@@ -42,227 +42,88 @@ body {
   color: #333;
 }
 
+.logo {
+  height: 48px;
+  width: 48px;
+  background: #333;
+  margin-right: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.search {
+  height: 2.25rem;
+}
+
+.search__bar {
+  border: none;
+  height: 2.25rem;
+  background: #fafafa;
+  padding: 0px 0.667rem;
+}
+
+.btn {
+  height: 2.25rem;
+  border: none;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.wrapper {
+  padding: 0px 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.menu {
+  display: flex;
+  justify-content: space-between;
+}
+
+.alert {
+  margin-right: 1.5rem;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.menu__container {
+  outline: 1px solid red;
+  flex: 3;
+}
+
+.menu__list {
+  background: palegoldenrod;
+}
+
+.nav {
+  width: 256px;
+  align-self: center;
+  margin-bottom: 8px;
+}
+.nav__list {
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+}
+.nav__item {
+  width: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nav__item__icon {
+  height: 48px;
+  width: 48px;
+  background: #333;
+}
+
 @media screen and (min-width: 600px) {
-  :root {
-    font-size: 16px;
-  }
-  .app {
-    min-height: 0px;
-    height: 100%;
-  }
-  .app > * {
-    height: 100%;
-  }
-  .container {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-column-gap: 1.5rem;
-    padding-right: 1.5rem;
-  }
-  .container > * {
-    padding-top: 1.5rem;
-  }
-  .page__searchbar {
-    grid-column: 11/13;
-    grid-row: 1;
-    z-index: 2;
-  }
-  .nav {
-    grid-column: 1/3;
-    grid-row: 1/-1;
-    background: #333;
-    color: #fff;
-    padding-left: 1.5rem;
-  }
-  .nav__list__link {
-    color: #fff;
-  }
-  .searchbar {
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.18);
-    padding: 0.444rem 1rem;
-    width: 100%;
-  }
-  .page__stage {
-    grid-column: 3/13;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    border-top: 4px solid #37a2ff;
-  }
-  .page__header {
-    margin-bottom: 1.5rem;
-  }
-  .page__content {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    grid-gap: 1.5rem;
-    padding-bottom: 1.5rem;
-  }
-
-  .home__news,
-  .home__activity {
-    display: flex;
-    flex-direction: column;
-  }
-  .home__news__title,
-  .home__activity__title {
-    background: #e9e9e9;
-    padding: 1.5rem;
-  }
-  .home__news {
-    grid-row: 1/4;
-    grid-column: 1/8;
-  }
-  .home__activity {
-    grid-row: 4/-1;
-    grid-column: 1/5;
-  }
-  .home__activity__area,
-  .home__news__item,
-  .home__cta,
-  .home__next_game {
-    background: #e9e9e9;
-    padding: 1.5rem;
-    flex: 1;
-  }
-  .home__next_game {
-    grid-column: 8/11;
-  }
-  .home__cta {
-    grid-column: 8/11;
-    grid-row: span 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  .home__cta__copy {
-    margin-bottom: 1rem;
-  }
-  .test {
-    grid-column: 5/11;
-    grid-row: span 3;
-    background: #e9e9e9;
-  }
-
-  .matches__attributes {
-    grid-column: 1;
-    grid-row: 1/9;
-  }
-  .matches__container {
-    grid-column: 2/10;
-    grid-row: 1/9;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-column-gap: 1.5rem;
-  }
-  .matches__card,
-  .matches__attributes {
-    display: grid;
-    grid-template-rows: repeat(8, 1fr);
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .matches__card {
-    background: #e9e9e9;
-    border-radius: 4px;
-    height: 100%;
-  }
-
-  .matches__card .matches__card__info {
-    padding-left: 1.5rem;
-  }
-  .matches__card__avatar {
-    grid-column: 1/3;
-    grid-row: 1/4;
-    background: #333;
-  }
-  .matches__card__endorsements {
-    grid-column: 2/3;
-    grid-row: 3/4;
-    z-index: 2;
-    background: #e9e9e9;
-    opacity: 0.5;
-  }
-
-  .matches__card__info {
-    grid-row: 5/8;
-    grid-column: 1/3;
-  }
-  .matches__card__name {
-    padding-left: 1.5rem;
-    display: flex;
-    align-items: center;
-  }
-  .matches__card__cta {
-    grid-row: 8;
-    grid-column: 1/3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .matches__card__attribute {
-    font-size: 0.666rem;
-  }
-  .matches__card__attributes--side {
-    text-align: end;
-  }
-
-  .btn--primary {
-    width: 50%;
-    padding: 0.444rem;
-    border: 0px;
-    background: #37a2ff;
-    color: #fff;
-    text-shadow: 1px solid rgba(0, 0, 0, 0.18);
-    font-size: 16px;
-    border-radius: 4px;
-  }
-
-  .pending_tab_panels {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-gap: 1.5rem;
-    height: 100%;
-  }
-
-  .pending_tab__entries {
-    grid-column: 1/5;
-  }
-  .pending_tab__request {
-    grid-column: 5/8;
-  }
-  .pending_tab__player_card {
-    grid-column: 8/11;
-  }
-
-  /* Tabs */
-  .react-tabs {
-    grid-row: 1/9;
-    grid-column: 1/11;
-  }
-  .react-tabs__tab-list {
-    display: grid;
-    grid-template-columns: repeat(2, 8rem);
-  }
-  .react-tabs__tab-list > * {
-    background: #e9e9e9;
-    padding: 0.666rem 1.5rem;
-    border-radius: 4px 4px 0px 0px;
-    text-align: center;
-  }
-  .react-tabs__tab--selected {
-    background: #f9f9f9;
-  }
-  .react-tabs__tab-panel {
-    background: #f9f9f9;
-    width: 100%;
-    height: calc(100% - 3rem);
-  }
-  .react-tabs > .react-tabs__tab-panel:not(.react-tabs__tab-panel--selected) {
-    display: none;
-  }
 }

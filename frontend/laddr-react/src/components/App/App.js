@@ -1,11 +1,6 @@
 import React, { Component } from "react";
 import "./App.css";
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import Landing from "../Landing/Landing";
-import Home from "../Pages/Home/Home";
-import FindPlayers from "../Pages/FindPlayers/FindPlayers";
-import PendingMatches from "../Pages/PendingMatches/PendingMatches";
-import Teams from "../Pages/Teams/Teams";
 
 class App extends Component {
   state = {
@@ -16,15 +11,59 @@ class App extends Component {
       isLoggedIn: !prevState.isLoggedIn
     }));
   };
-
   render() {
+    function extendList(e) {
+      console.log("this was clicked");
+    }
     return (
-      <div className="app">
-        <Route exact path="/" component={Landing} />
-        <Route path="/home" component={Home} />
-        <Route path="/find-players" component={FindPlayers} />
-        <Route path="/pending-matches" component={PendingMatches} />
-        <Route path="/teams" component={Teams} />
+      <div className="app wrapper">
+        <div className="page">
+          <header className="header">
+            <div className="logo" />
+            <div className="search">
+              <input
+                type="search"
+                className="search__bar"
+                placeholder="Search"
+              />
+              <button className="btn search__btn">go</button>
+            </div>
+          </header>
+          <div className="menu">
+            <div className="alert">!</div>
+            <div className="menu__container" onClick={extendList}>
+              <ul className="menu__list">
+                <li className="menu__items">Item</li>
+                <li className="menu__items">Item</li>
+                <li className="menu__items">Item</li>
+              </ul>
+            </div>
+          </div>
+          <main className="content">
+            <h1 className="content__title">Title </h1>
+            <h2 className="content__subtitle">Subtitle</h2>
+          </main>
+        </div>
+        <nav className="nav">
+          <ul className="nav__list">
+            <li className="nav__item">
+              <span className="nav__item__icon" />
+              Home
+            </li>
+            <li className="nav__item">
+              <span className="nav__item__icon" />
+              Teams
+            </li>
+            <li className="nav__item">
+              <span className="nav__item__icon" />
+              Matches
+            </li>
+            <li className="nav__item">
+              <span className="nav__item__icon" />
+              Profile
+            </li>
+          </ul>
+        </nav>
       </div>
     );
   }
