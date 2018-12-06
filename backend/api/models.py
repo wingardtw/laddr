@@ -45,9 +45,7 @@ class Profile(models.Model):
         max_length=15, choices=ROLES, null=True, blank=True
     )
     availabilities = models.ManyToManyField("Availability")
-    rank = models.CharField(
-        max_length=15, choices=RANKS, blank=True, null=True
-    )
+    rank = models.IntegerField(choices=RANKS, blank=True, null=True)
     is_real = models.BooleanField(default=True)
 
     johnny_rank = models.IntegerField(default=0)
@@ -320,11 +318,12 @@ class MatchingPreference(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     player = models.ForeignKey("Profile", on_delete=models.CASCADE)
 
-    rank = models.CharField(
-        max_length=15, choices=RANKS, blank=True, null=True
-    )
+    rank = models.IntegerField(choices=RANKS, blank=True, null=True)
     rank_importance = models.IntegerField(default=0)
     role = models.CharField(
         max_length=15, choices=ROLES, null=True, blank=True
     )
     role_importance = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.player.user.username

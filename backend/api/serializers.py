@@ -26,7 +26,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             'uuid',
             'user',
             'summoner_name',
-            'lol_server',
             'playstyle',
             'bio',
             'role',

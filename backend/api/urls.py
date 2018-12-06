@@ -20,5 +20,4 @@ urlpatterns = [
     path("", include(router.urls)),
     url(r"^auth$", drf_views.obtain_auth_token, name="auth"),
     url(r"^calibrate$", views.calibrate, name="calibrate"),
-    path("loading_taglines", views.loading_taglines),
 ]

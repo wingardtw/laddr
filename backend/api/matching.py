@@ -1,4 +1,4 @@
-from api.models import Profile, LaddrMatch
+from api.models import Profile, LaddrMatch, MatchingPreference
 from django.db.models import Q
 
 
@@ -13,6 +13,17 @@ def exclude_matches(profile):
         *[x.player_b.uuid for x in matches],
     ]
     return matched_ids
+
+
+def filter_by_preference(profile):
+    """ For a given profile, return a list of profild ids that satisfy
+        criteria in that profile's preferences
+    """
+    if not MatchingPreference.objects.filter(player=profile).exists():
+        return []
+    matched_ids = exclude_matches(profile)
+    new = Profile.objects.exclude(uuid__in=matched_ids)
+
 
 
 def find_match_tier_1(profile):
