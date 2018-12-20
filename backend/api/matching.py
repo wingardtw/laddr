@@ -25,7 +25,6 @@ def filter_by_preference(profile):
     new = Profile.objects.exclude(uuid__in=matched_ids)
 
 
-
 def find_match_tier_1(profile):
     """ Finds a profile to serve as a potential tier 1 match
         Tier 1 match is defined as a random match
@@ -64,4 +63,5 @@ def find_match_tier_4(profile):
     """
     matched_ids = exclude_matches(profile)
     profiles = Profile.objects.exclude(uuid__in=matched_ids)
+    preference = profile.matchingpreference
     # LaddrMatch based on profile similarity

@@ -316,7 +316,7 @@ class Endorsements(models.Model):
 
 class MatchingPreference(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    player = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    player = models.OneToOneField("Profile", on_delete=models.CASCADE)
 
     rank = models.IntegerField(choices=RANKS, blank=True, null=True)
     rank_importance = models.IntegerField(default=0)
