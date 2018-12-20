@@ -4,10 +4,12 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
 
 from api.utility import default_match_expire
 
@@ -57,7 +59,39 @@ class Profile(models.Model):
 
     @property
     def user_matches(self):
-        return self.mat.all() | self.usermatch_player_b.all()
+        return self.match_requests_received.all() | self.match_requests_received.all()
+
+    def excluded_ids(self):
+        matches = LaddrMatch.objects.filter(Q(player_a=self) | Q(player_b=self))
+        matched_ids = set()
+        for match in matches:
+            matched_ids.add(match.player_a.uuid)
+            matched_ids.add(match.player_b.uuid)
+        return list(matched_ids)
+
+    def gen_match(self, store=True):
+        matched_ids = self.excluded_ids()
+
+        # Random match
+        matched_profile = Profile.objects.exclude(uuid__in=matched_ids).first()
+
+        # Try match based on goal
+
+        if not matched_profile:
+            return None
+
+        # Finally create match object
+        match = LaddrMatch(
+            player_a=self,
+            player_b=matched_profile,
+            primary_reason="Random",
+        )
+
+        if store:
+            # Save the final match object
+            match.save()
+
+        return match
 
 
 @receiver(post_save, sender=User)
@@ -168,7 +202,7 @@ class LaddrMatch(Connection):
     def save(self, *args, **kwargs):
         if self.player_a == self.player_b:
             raise ValidationError("Players cannot match themselves")
-        super(Endorsements, self).save(*args, **kwargs)
+        super(LaddrMatch, self).save(*args, **kwargs)
 
 
 class DuoPartner(Connection):

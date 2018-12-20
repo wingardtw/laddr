@@ -1,6 +1,6 @@
-import datetime
-from django.utils import timezone
 from backend.settings import DEFAULT_MATCH_DURATION
+from django.utils import timezone
+import datetime
 
 
 def default_match_expire():
