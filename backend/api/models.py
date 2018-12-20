@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
@@ -49,18 +51,33 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def laddr_matches(self):
+        return self.laddrmatch_player_a.all() | self.laddrmatch_player_b.all()
+
+    @property
+    def user_matches(self):
+        return self.mat.all() | self.usermatch_player_b.all()
+
+
+@receiver(post_save, sender=User)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    instance.profile.save()
+
 
 class Connection(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     player_a = models.ForeignKey(
         "Profile",
         on_delete=models.CASCADE,
-        related_name='%(app_label)s_%(class)s_player_a',
+        related_name='%(class)s_player_a',
     )
     player_b = models.ForeignKey(
         "Profile",
         on_delete=models.CASCADE,
-        related_name='%(app_label)s_%(class)s_player_b',
+        related_name='%(class)s_player_b',
     )
 
     # Metadata
@@ -79,12 +96,12 @@ class UserMatch(models.Model):
     """"User initiated matches"""
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     from_user = models.ForeignKey(
-        User,
+        "Profile",
         on_delete=models.CASCADE,
         related_name='match_requests_sent'
     )
     to_user = models.ForeignKey(
-        User,
+        "Profile",
         on_delete=models.CASCADE,
         related_name='match_requests_received'
     )
@@ -231,3 +248,10 @@ class MatchingPreference(models.Model):
 
     def __str__(self):
         return self.player.user.username
+
+
+@receiver(post_save, sender=Profile)
+def create_or_update_matching_preference(sender, instance, created, **kwargs):
+    if created:
+        MatchingPreference.objects.create(player=instance)
+    instance.matchingpreference.save()
