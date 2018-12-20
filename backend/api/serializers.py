@@ -22,17 +22,10 @@ class ProfileSerializer(serializers.ModelSerializer):
             'user',
             'summoner_name',
             'playstyle',
-            'bio',
             'role',
+            'goal',
             'rank',
             'is_real',
-            'num_profiles_ranked',
-            'johnny_rank',
-            'timmy_rank',
-            'spike_rank',
-            'preferred_johnny_rank',
-            'preferred_timmy_rank',
-            'preferred_spike_rank',
             'endorsements',
         )
         read_only_fields = (
