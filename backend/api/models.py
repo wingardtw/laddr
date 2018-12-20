@@ -31,7 +31,6 @@ class Profile(models.Model):
     )
     goal = models.TextField(max_length=200, blank=True, null=False)
     favorite_color = models.CharField(max_length=15, blank=True, null=True)
-    bio = models.TextField(max_length=500, blank=True, null=False)
     role = models.CharField(
         max_length=15, choices=ROLES, null=True, blank=True
     )
@@ -49,14 +48,6 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
-
-    def get_psyche(self):
-        stats = {
-            "Creative": self.johnny_rank,
-            "Competitive": self.spike_rank,
-            "Casual": self.timmy_rank,
-        }
-        return max(stats.keys(), key=(lambda key: stats[key]))
 
 
 class Connection(models.Model):

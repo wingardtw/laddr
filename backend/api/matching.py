@@ -45,17 +45,6 @@ def find_match_tier_2(profile):
     # LaddrMatch based on goal similarity
 
 
-def find_match_tier_3(profile):
-    """ Finds a profile to serve as a potential tier 3 match
-        Tier 3 match is based on user's calibration results
-        @profile - api.models.Profile to be matched
-    """
-    matched_ids = exclude_matches(profile)
-    profiles = Profile.objects.exclude(uuid__in=matched_ids)
-    # LaddrMatch based on calibration
-    x = [*['1'], *['2']]
-
-
 def find_match_tier_4(profile):
     """ Finds a profile to serve as a potential tier 4 match
         Based on user's match preferences
