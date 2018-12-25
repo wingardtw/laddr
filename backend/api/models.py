@@ -67,6 +67,10 @@ class Profile(models.Model):
         matches = LaddrMatch.objects.filter(Q(player_a=self) | Q(player_b=self))
         matched_ids = set()
 
+        # Always exclude admins
+        for user in User.objects.filter(is_superuser=True):
+            matched_ids.add(user.profile.uuid)
+
         # Don't match with existing matches
         for match in matches:
             # Should allow new match if old expired
