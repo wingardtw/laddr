@@ -126,3 +126,4 @@ STATIC_URL = '/static/'
 
 # Default duration in days
 DEFAULT_MATCH_DURATION = 24
+DEFAULT_RANK_TOLERANCE = 3
