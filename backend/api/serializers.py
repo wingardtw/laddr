@@ -5,6 +5,7 @@ from api.models import (
     Endorsements,
     LaddrMatch,
     Profile,
+    UserMatch,
 )
 
 
@@ -46,6 +47,23 @@ class LaddrMatchSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             'created_at',
+        )
+
+
+class UserMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMatch
+        fields = (
+            'uuid',
+            'from_user',
+            'to_user',
+            'message',
+            'rejected_at',
+            'viewed_at',
+        )
+        read_only_fields = (
+            'rejected_at',
+            'viewed_at',
         )
 
 

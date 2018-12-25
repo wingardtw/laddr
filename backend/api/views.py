@@ -6,6 +6,7 @@ from api.models import (
     Endorsements,
     LaddrMatch,
     Profile,
+    UserMatch,
 )
 
 # Create your views here.
@@ -28,6 +29,11 @@ class ProfileViewSet(viewsets.ModelViewSet):
 class LaddrMatchViewSet(viewsets.ModelViewSet):
     queryset = LaddrMatch.objects.all()
     serializer_class = serializers.LaddrMatchSerializer
+
+
+class UserMatchViewSet(viewsets.ModelViewSet):
+    queryset = UserMatch.objects.all()
+    serializer_class = serializers.UserMatchSerializer
 
 
 class EndorsementViewSet(viewsets.ModelViewSet):

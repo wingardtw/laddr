@@ -10,6 +10,7 @@ router.register(r"profiles", views.ProfileViewSet)
 router.register(r"laddrmatches", views.LaddrMatchViewSet)
 router.register(r"endorsement", views.EndorsementViewSet)
 router.register(r"endorsements", views.EndorsementsViewSet)
+router.register(r"usermatches", views.UserMatchViewSet)
 
 app_name = "api"
 urlpatterns = [

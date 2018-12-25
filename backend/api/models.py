@@ -61,21 +61,38 @@ class Profile(models.Model):
     def user_matches(self):
         return self.match_requests_received.all() | self.match_requests_received.all()
 
+    @property
     def excluded_ids(self):
+        """ Utility function for discerning unmatchable profiles"""
         matches = LaddrMatch.objects.filter(Q(player_a=self) | Q(player_b=self))
         matched_ids = set()
+
+        # Don't match with existing matches
         for match in matches:
-            matched_ids.add(match.player_a.uuid)
-            matched_ids.add(match.player_b.uuid)
+            # Should allow new match if old expired
+            if not match.expired:
+                matched_ids.add(match.player_a.uuid)
+                matched_ids.add(match.player_b.uuid)
+
+        # Don't match with existing partners
+        for partner in DuoPartner.objects.filter(Q(player_a=self) | Q(player_b=self)):
+            matched_ids.add(partner.player_a.uuid)
+            matched_ids.add(partner.player_b.uuid)
+
         return list(matched_ids)
 
     def gen_match(self, store=True):
         matched_ids = self.excluded_ids()
 
-        # Random match
+        # Random match first
         matched_profile = Profile.objects.exclude(uuid__in=matched_ids).first()
+        primary_reason = "Random"
 
         # Try match based on goal
+
+        # Try based on preference
+        preference = self.matchingpreference
+        print(preference)
 
         if not matched_profile:
             return None
@@ -84,7 +101,7 @@ class Profile(models.Model):
         match = LaddrMatch(
             player_a=self,
             player_b=matched_profile,
-            primary_reason="Random",
+            primary_reason=primary_reason,
         )
 
         if store:
@@ -154,7 +171,7 @@ class UserMatch(models.Model):
         return "%s" % self.from_user_id
 
     def save(self, *args, **kwargs):
-        if self.player_a == self.player_b:
+        if self.from_user == self.to_user:
             raise ValidationError("Cannot request match with self")
         super(UserMatch, self).save(*args, **kwargs)
 
