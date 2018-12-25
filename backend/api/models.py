@@ -287,6 +287,7 @@ class LaddrMatch(Connection):
                     self.player_a,
                     self.player_b,
                 )
+
             elif self.player_b_accept:
                 print("Creating partnership")
                 DuoPartner.objects.create(
@@ -295,6 +296,7 @@ class LaddrMatch(Connection):
                 )
                 print("Deleting Match object")
                 self.delete()
+
             else:
                 print("Updating match")
                 self.player_a_accept = True
