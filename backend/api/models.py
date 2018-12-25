@@ -10,6 +10,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
+from backend.settings import DEFAULT_RANK_TOLERANCE
 
 from api.utility import default_match_expire
 
@@ -86,19 +87,41 @@ class Profile(models.Model):
         return list(matched_ids)
 
     def gen_match(self, store=True):
-        matched_ids = self.excluded_ids()
+        matched_ids = self.excluded_ids
+        filtered_matches = Profile.objects.exclude(uuid__in=matched_ids)
+        primary_reason, secondary_reason, tertiary_reason = None, None, None
 
         # Random match first
-        matched_profile = Profile.objects.exclude(uuid__in=matched_ids).first()
+        matched_profile = filtered_matches.first()
         primary_reason = "Random"
 
         # Try match based on goal
 
         # Try based on preference
         preference = self.matchingpreference
-        print(preference)
+        if preference.role:
+            print('Considering role')
+            filtered_matches = filtered_matches.filter(role=preference.role)
+            primary_reason = "Preferred role"
+
+        if preference.rank:
+            print('Considering rank')
+            floor = RANKS[0][0]
+            ciel = RANKS[-1][0]
+            if self.rank - DEFAULT_RANK_TOLERANCE > floor:
+                floor = self.rank - DEFAULT_RANK_TOLERANCE
+            if self.rank + DEFAULT_RANK_TOLERANCE < ciel:
+                ciel = self.rank + DEFAULT_RANK_TOLERANCE
+            filtered_matches = filtered_matches.filter(rank__range=[floor, ciel])
+            if primary_reason:
+                secondary_reason = "Preferred rank"
+            else:
+                primary_reason = "Preferred rank"
+
+        matched_profile = filtered_matches.first()
 
         if not matched_profile:
+            print('None found')
             return None
 
         # Finally create match object
@@ -106,6 +129,8 @@ class Profile(models.Model):
             player_a=self,
             player_b=matched_profile,
             primary_reason=primary_reason,
+            secondary_reason=secondary_reason,
+            tertiary_reason=tertiary_reason,
         )
 
         if store:
@@ -225,6 +250,14 @@ class LaddrMatch(Connection):
             raise ValidationError("Players cannot match themselves")
         super(LaddrMatch, self).save(*args, **kwargs)
 
+    def add_reasons(self, reasons):
+        if reasons:
+            self.primary_reason = reasons.pop(0)
+        if reasons:
+            self.secondary_reason = reasons.pop(0)
+        if reasons:
+            self.tertiary_reason = reasons.pop(0)
+
 
 class DuoPartner(Connection):
     """Accepted matches"""
@@ -302,7 +335,11 @@ class MatchingPreference(models.Model):
     role_importance = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.player.user.username
+        return "{} -- Rank: {} -- Role: {}".format(
+            self.player.user.username,
+            self.get_rank_display(),
+            self.get_role_display(),
+        )
 
 
 @receiver(post_save, sender=Profile)
