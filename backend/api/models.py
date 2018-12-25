@@ -149,6 +149,18 @@ class Profile(models.Model):
 
         return match
 
+    def match_request(self, to_match, message=None):
+        try:
+            user_match = UserMatch(
+                from_user=self,
+                to_user=to_match,
+                message=message,
+            )
+            user_match.save()
+            return user_match
+        except ValidationError as e:
+            return e.message
+
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
@@ -260,13 +272,59 @@ class LaddrMatch(Connection):
             raise ValidationError("Players cannot match themselves")
         super(LaddrMatch, self).save(*args, **kwargs)
 
-    def add_reasons(self, reasons):
-        if reasons:
-            self.primary_reason = reasons.pop(0)
-        if reasons:
-            self.secondary_reason = reasons.pop(0)
-        if reasons:
-            self.tertiary_reason = reasons.pop(0)
+    def accept(self, player):
+        # Make sure player argument is player_a or player_b
+        if self.player_a != player and self.player_b != player:
+            raise ValidationError('This match does not have {}'.format(player))
+
+        if self.expired:
+            raise ValidationError('Match expired')
+
+        # Logic for player a
+        if player == self.player_a:
+            if self.player_a_accept:
+                return '{} already accepted. Waiting on {}'.format(
+                    self.player_a,
+                    self.player_b,
+                )
+            elif self.player_b_accept:
+                print("Creating partnership")
+                DuoPartner.objects.create(
+                    player_a=self.player_a,
+                    player_b=self.player_b,
+                )
+                print("Deleting Match object")
+                self.delete()
+            else:
+                print("Updating match")
+                self.player_a_accept = True
+                self.player_a_accept_at = timezone.now()
+
+        # Logic for player b
+        elif player == self.player_b:
+            # Don't accept again
+            if self.player_b_accept:
+                return '{} already accepted. Waiting on {}'.format(
+                    self.player_b,
+                    self.player_a,
+                )
+
+            elif self.player_a_accept:
+                print("Creating Partnership")
+                DuoPartner.objects.create(
+                    player_a=self.player_a,
+                    player_b=self.player_b,
+                )
+                print("Deleting Match Object")
+                self.delete()
+
+            else:
+                print("Updating match")
+                self.player_b_accept = True
+                self.player_b_accept_at = timezone.now()
+
+        # Save match
+        self.save()
 
 
 class DuoPartner(Connection):
