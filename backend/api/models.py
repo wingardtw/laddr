@@ -99,25 +99,35 @@ class Profile(models.Model):
 
         # Try based on preference
         preference = self.matchingpreference
+
+        # If role preference exists and want to filter by role
         if preference.role and use_role:
             print('Considering role')
             filtered_matches = filtered_matches.filter(role=preference.role)
             primary_reason = "Preferred role"
 
+        # If rank preference exists and want to filter by rank
         if preference.rank and use_rank:
             print('Considering rank')
             floor = RANKS[0][0]
             ciel = RANKS[-1][0]
-            if self.rank - DEFAULT_RANK_TOLERANCE > floor:
-                floor = self.rank - DEFAULT_RANK_TOLERANCE
-            if self.rank + DEFAULT_RANK_TOLERANCE < ciel:
-                ciel = self.rank + DEFAULT_RANK_TOLERANCE
+
+            if preference.rank - DEFAULT_RANK_TOLERANCE > floor:
+                floor = preference.rank - DEFAULT_RANK_TOLERANCE
+            if preference.rank + DEFAULT_RANK_TOLERANCE < ciel:
+                ciel = preference.rank + DEFAULT_RANK_TOLERANCE
+
+            print("Rank between {} and {}".format(RANKS[floor][0], RANKS[ciel][0]))
+
             filtered_matches = filtered_matches.filter(rank__range=[floor, ciel])
             if primary_reason:
                 secondary_reason = "Preferred rank"
             else:
                 primary_reason = "Preferred rank"
 
+        print("{} possible matches left after filtering".format(
+                len(filtered_matches),
+            ))
         matched_profile = filtered_matches.first()
 
         if not matched_profile:
