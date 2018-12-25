@@ -86,7 +86,7 @@ class Profile(models.Model):
 
         return list(matched_ids)
 
-    def gen_match(self, store=True):
+    def gen_match(self, store=True, use_rank=True, use_role=True):
         matched_ids = self.excluded_ids
         filtered_matches = Profile.objects.exclude(uuid__in=matched_ids)
         primary_reason, secondary_reason, tertiary_reason = None, None, None
@@ -99,12 +99,12 @@ class Profile(models.Model):
 
         # Try based on preference
         preference = self.matchingpreference
-        if preference.role:
+        if preference.role and use_role:
             print('Considering role')
             filtered_matches = filtered_matches.filter(role=preference.role)
             primary_reason = "Preferred role"
 
-        if preference.rank:
+        if preference.rank and use_rank:
             print('Considering rank')
             floor = RANKS[0][0]
             ciel = RANKS[-1][0]
