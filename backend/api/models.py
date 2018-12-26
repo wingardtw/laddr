@@ -125,9 +125,9 @@ class Profile(models.Model):
             else:
                 primary_reason = "Preferred rank"
 
-        print("{} possible matches left after filtering".format(
-                len(filtered_matches),
-            ))
+        print(
+            "{} possible matches left after filtering".format(len(filtered_matches))
+        )
         matched_profile = filtered_matches.first()
 
         if not matched_profile:
