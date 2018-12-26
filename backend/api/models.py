@@ -262,6 +262,45 @@ class LaddrMatch(Connection):
     expired = models.BooleanField(default=False)
     expires_at = models.DateTimeField(default=default_match_expire)
 
+    @property
+    def accepted(self):
+        return self.player_a_accept and self.player_b_accept
+
+    @property
+    def rejected(self):
+        a_rejected = self.player_a_rejected_at is not None
+        b_rejected = self.player_b_rejected_at is not None
+        if a_rejected:
+            print("{} rejected at {}".format(
+                self.player_a,
+                self.player_a_rejected_at,
+            ))
+        if b_rejected:
+            print("{} rejected at {}".format(
+                self.player_b,
+                self.player_b_rejected_at,
+            ))
+        return a_rejected or b_rejected
+
+    @property
+    def status(self):
+        if self.expired:
+            return "Expired"
+        if self.accepted:
+            return "Accepted"
+        if self.rejected:
+            return "Rejected"
+        if self.player_a_accept:
+            return "{} accepted, {} has yet to respond".format(
+                self.player_a,
+                self.player_b,
+            )
+        if self.player_b_accept:
+            return "{} accepted, {} has yet to respond".format(
+                self.player_b,
+                self.player_a,
+            )
+
     def __str__(self):
         return "Match between {} and {}".format(
             self.player_a.user.username, self.player_b.user.username
@@ -282,6 +321,13 @@ class LaddrMatch(Connection):
 
         # Logic for player a
         if player == self.player_a:
+
+            # Ensure other player has not rejected already
+            if self.player_b_rejected_at is not None:
+                raise ValidationError("{} has already rejected".format(
+                    self.player_b,
+                ))
+
             if self.player_a_accept:
                 return '{} already accepted. Waiting on {}'.format(
                     self.player_a,
@@ -304,7 +350,12 @@ class LaddrMatch(Connection):
 
         # Logic for player b
         elif player == self.player_b:
-            # Don't accept again
+
+            # Ensure other player has not rejected already
+            if self.player_a_rejected_at is not None:
+                raise ValidationError("{} has already rejected".format(
+                    self.player_a,
+                ))
             if self.player_b_accept:
                 return '{} already accepted. Waiting on {}'.format(
                     self.player_b,
@@ -329,23 +380,30 @@ class LaddrMatch(Connection):
         self.save()
 
     def reject(self, player):
+        # Assert player is part of match
         if player != self.player_a and player != self.player_b:
             raise ValidationError(
                 '{} is not associated with this match'.format(player)
             )
 
+        # Do nothing to expired match
         if self.expired:
             raise ValidationError('Match expired')
 
+        # Player a logic
         if player == self.player_a:
-            self.player_a_accept = None
+            self.player_a_accept = False
             self.player_a_accept_at = None
             self.player_a_rejected_at = timezone.now()
 
+        # Player b logic
         elif player == self.player_b:
-            self.player_b_accept = None
+            self.player_b_accept = False
             self.player_b_accept_at = None
             self.player_b_rejected_at = timezone.now()
+
+        # Save match
+        self.save()
 
 
 class DuoPartner(Connection):
