@@ -328,6 +328,25 @@ class LaddrMatch(Connection):
         # Save match
         self.save()
 
+    def reject(self, player):
+        if player != self.player_a and player != self.player_b:
+            raise ValidationError(
+                '{} is not associated with this match'.format(player)
+            )
+
+        if self.expired:
+            raise ValidationError('Match expired')
+
+        if player == self.player_a:
+            self.player_a_accept = None
+            self.player_a_accept_at = None
+            self.player_a_rejected_at = timezone.now()
+
+        elif player == self.player_b:
+            self.player_b_accept = None
+            self.player_b_accept_at = None
+            self.player_b_rejected_at = timezone.now()
+
 
 class DuoPartner(Connection):
     """Accepted matches"""
