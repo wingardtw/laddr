@@ -86,7 +86,7 @@ class Profile(models.Model):
 
         return list(matched_ids)
 
-    def gen_match(self, store=True, use_rank=True, use_role=True):
+    def gen_match(self, store=True, use_rank=True, use_role=True, use_goal=True):
         matched_ids = self.excluded_ids
         filtered_matches = Profile.objects.exclude(uuid__in=matched_ids)
         primary_reason, secondary_reason, tertiary_reason = None, None, None
@@ -96,6 +96,7 @@ class Profile(models.Model):
         primary_reason = "Random"
 
         # Try match based on goal
+
 
         # Try based on preference
         preference = self.matchingpreference
@@ -124,6 +125,31 @@ class Profile(models.Model):
                 secondary_reason = "Preferred rank"
             else:
                 primary_reason = "Preferred rank"
+
+        #Add matching based on goal here, after filtering has been applied for other aspects.
+
+        #The skeleton of this function would basically be to load in the current user's goal, and compare it against all other filtered user goals.
+        #Then, you would sort the filtered_matches list by the goal similarity score. 
+        # print("Considering goal")
+        # nlp = spacy.load('en_core_web_md')
+
+        # user_goal = self.goal
+        # user_nlp=nlp(user_goal)
+        # goallist = []
+
+        # for p in filtered_matches:
+        #    match_goal = p.goal
+        #    match_nlp = nlp(match_goal)
+        #    goal_sim = user_nlp.similarity(match_nlp)
+        #    #now add profile uuid and similarity to an array as a tuple
+        #    goal_tuple = (p.uuid, goal_sim)
+        #    #append each tuple to the goal list
+        #    goallist.append(goal_tuple)
+      
+        #Now we order the filtered matches by goal similarity score
+
+        # mapping = dict(filtered_matches)
+        # filtered_matches[:]=[(uuid,mapping[uuid]) for uuid in goallist]
 
         print(
             "{} possible matches left after filtering".format(len(filtered_matches))
@@ -192,6 +218,20 @@ class Connection(models.Model):
         if self.player_a == self.player_b:
             raise ValidationError("Cannot connect with self")
         super(Connection, self).save(*args, **kwargs)
+
+
+class GoalRating(Connection):
+    score = models.DecimalField(default=0.0,decimal_places=3,max_digits=4)
+
+    def __str__(self):
+        return "%s is %f compatible with %s" % self.player_a, 100 * self.score, self.player_b
+
+@receiver(post_save, sender=Profile)
+def create_or_update_goal_mapping(sender, instance, created, **kwargs):
+#    if created:
+#        MatchingPreference.objects.create(player=instance)
+#    instance.matchingpreference.save()
+
 
 
 class UserMatch(models.Model):
