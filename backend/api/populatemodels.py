@@ -34,6 +34,8 @@ def populate_test_users(N=10):
         fake_ps = random.choice(playstyles)[0]
         fake_fc = fakegen.safe_color_name()
         fake_goal = bios[entry]
+        if fake_goal[0] == '[' and fake_goal[-1] == ']':
+            fake_goal = fake_goal.strip('\'[]')
         fake_role = random.choice(role)[0]
         fake_rank = random.choice(rank)[0]
 
