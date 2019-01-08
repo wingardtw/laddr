@@ -220,17 +220,17 @@ class Connection(models.Model):
         super(Connection, self).save(*args, **kwargs)
 
 
-class GoalRating(Connection):
-    score = models.DecimalField(default=0.0,decimal_places=3,max_digits=4)
+# class GoalRating(Connection):
+#     score = models.DecimalField(default=0.0,decimal_places=3,max_digits=4)
 
-    def __str__(self):
-        return "%s is %f compatible with %s" % self.player_a, 100 * self.score, self.player_b
+#     def __str__(self):
+#         return "%s is %f compatible with %s" % self.player_a, 100 * self.score, self.player_b
 
-@receiver(post_save, sender=Profile)
-def create_or_update_goal_mapping(sender, instance, created, **kwargs):
-#    if created:
-#        MatchingPreference.objects.create(player=instance)
-#    instance.matchingpreference.save()
+# @receiver(post_save, sender=Profile)
+# def create_or_update_goal_mapping(sender, instance, created, **kwargs):
+# #    if created:
+# #        MatchingPreference.objects.create(player=instance)
+# #    instance.matchingpreference.save()
 
 
 
