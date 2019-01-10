@@ -10,7 +10,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
-from backend.settings import DEFAULT_RANK_TOLERANCE
+from backend.settings import DEFAULT_RANK_TOLERANCE, GOAL_SIMILARITY_THRESH
 
 from api.utility import default_match_expire
 
@@ -129,6 +129,23 @@ class Profile(models.Model):
 
         # Add matching based on goal here, after filtering has been applied
         # for other aspects.
+
+        if use_goal:
+            print('Considering goal similarity')
+            temp = filtered_matches.filter(
+                goalrating_player_b__score__gte=GOAL_SIMILARITY_THRESH
+            )
+            if temp.count >= 3:
+                filtered_matches = temp
+            else:
+                print('Less than 3 left after filtering by goal')
+
+            # Shift all 'reasons' down in rank
+            if primary_reason:
+                if secondary_reason:
+                    tertiary_reason = secondary_reason
+                secondary_reason = primary_reason
+            primary_reason = 'Matched based on goal similarity'
 
         # The skeleton of this function would basically be to load
         # in the current user's goal, and compare it against all

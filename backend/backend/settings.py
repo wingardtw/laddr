@@ -127,3 +127,6 @@ STATIC_URL = '/static/'
 # Default duration in days
 DEFAULT_MATCH_DURATION = 24
 DEFAULT_RANK_TOLERANCE = 3
+
+# Default goal similarity threshold
+GOAL_SIMILARITY_THRESH = 0.5
