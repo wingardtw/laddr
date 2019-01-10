@@ -97,7 +97,6 @@ class Profile(models.Model):
 
         # Try match based on goal
 
-
         # Try based on preference
         preference = self.matchingpreference
 
@@ -118,7 +117,9 @@ class Profile(models.Model):
             if preference.rank + DEFAULT_RANK_TOLERANCE < ciel:
                 ciel = preference.rank + DEFAULT_RANK_TOLERANCE
 
-            print("Rank between {} and {}".format(RANKS[floor][0], RANKS[ciel][0]))
+            print("Rank between {} and {}".format(
+                RANKS[floor][0], RANKS[ciel][0])
+            )
 
             filtered_matches = filtered_matches.filter(rank__range=[floor, ciel])
             if primary_reason:
@@ -126,10 +127,14 @@ class Profile(models.Model):
             else:
                 primary_reason = "Preferred rank"
 
-        #Add matching based on goal here, after filtering has been applied for other aspects.
+        # Add matching based on goal here, after filtering has been applied
+        # for other aspects.
 
-        #The skeleton of this function would basically be to load in the current user's goal, and compare it against all other filtered user goals.
-        #Then, you would sort the filtered_matches list by the goal similarity score. 
+        # The skeleton of this function would basically be to load
+        # in the current user's goal, and compare it against all
+        # other filtered user goals.
+        # Then, you would sort the filtered_matches list by the goal
+        # similarity score.
         # print("Considering goal")
         # nlp = spacy.load('en_core_web_md')
 
@@ -145,8 +150,8 @@ class Profile(models.Model):
         #    goal_tuple = (p.uuid, goal_sim)
         #    #append each tuple to the goal list
         #    goallist.append(goal_tuple)
-      
-        #Now we order the filtered matches by goal similarity score
+
+        # Now we order the filtered matches by goal similarity score
 
         # mapping = dict(filtered_matches)
         # filtered_matches[:]=[(uuid,mapping[uuid]) for uuid in goallist]
@@ -220,18 +225,13 @@ class Connection(models.Model):
         super(Connection, self).save(*args, **kwargs)
 
 
-# class GoalRating(Connection):
-#     score = models.DecimalField(default=0.0,decimal_places=3,max_digits=4)
+class GoalRating(Connection):
+    score = models.DecimalField(default=0.0, decimal_places=3, max_digits=4)
 
-#     def __str__(self):
-#         return "%s is %f compatible with %s" % self.player_a, 100 * self.score, self.player_b
-
-# @receiver(post_save, sender=Profile)
-# def create_or_update_goal_mapping(sender, instance, created, **kwargs):
-# #    if created:
-# #        MatchingPreference.objects.create(player=instance)
-# #    instance.matchingpreference.save()
-
+    def __str__(self):
+        return "{} is {} compatible with {}".format(
+            self.player_a, 100 * self.score, self.player_b
+        )
 
 
 class UserMatch(models.Model):
