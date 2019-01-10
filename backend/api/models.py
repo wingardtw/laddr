@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, IntegrityError
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -192,6 +192,34 @@ class Profile(models.Model):
         except ValidationError as e:
             return e.message
 
+    def _rate_goal(self, player_b, score, overwrite=False):
+        try:
+            rating = GoalRating(
+                player_a=self,
+                player_b=player_b,
+                score=score,
+            )
+            rating.save()
+            return rating
+        except ValidationError as e:
+            return e.message
+        except IntegrityError as e:
+            if overwrite:
+                return self._update_rating(player_b, score)
+            raise e
+
+    def _update_rating(self, player_b, score):
+        try:
+            rating = GoalRating.objects.get(
+                player_a=self,
+                player_b=player_b,
+            )
+            rating.score = score
+            rating.save()
+            return rating
+        except models.ObjectDoesNotExist as e:
+            return e.message
+
 
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
@@ -201,6 +229,8 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 
 
 class Connection(models.Model):
+    validation_err = "Cannot connect with self"
+
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     player_a = models.ForeignKey(
         "Profile",
@@ -218,20 +248,29 @@ class Connection(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ('player_a', 'player_b')
 
     def save(self, *args, **kwargs):
         if self.player_a == self.player_b:
-            raise ValidationError("Cannot connect with self")
+            raise ValidationError(self.validation_err)
         super(Connection, self).save(*args, **kwargs)
 
 
 class GoalRating(Connection):
+    validation_err = "Cannot rate own goal"
+
     score = models.DecimalField(default=0.0, decimal_places=3, max_digits=4)
 
     def __str__(self):
-        return "{} is {} compatible with {}".format(
+        return "{} is {}% compatible with {}".format(
             self.player_a, 100 * self.score, self.player_b
         )
+
+    # @receiver(post_save, sender=Profile)
+    # def create_or_update_goal_mapping(sender, instance, created, **kwargs):
+    #     if created:
+    #         MatchingPreference.objects.create(player=instance)
+    #     instance.matchingpreference.save()
 
 
 class UserMatch(models.Model):
