@@ -63,6 +63,10 @@ class Profile(models.Model):
         return self.match_requests_received.all() | self.match_requests_received.all()
 
     @property
+    def all_goal_ratings(self):
+        return self.goalrating_player_a.all() | self.goalrating_player_b.all()
+
+    @property
     def excluded_ids(self):
         """ Utility function for discerning unmatchable profiles"""
         matches = LaddrMatch.objects.filter(Q(player_a=self) | Q(player_b=self))
@@ -135,7 +139,7 @@ class Profile(models.Model):
             temp = filtered_matches.filter(
                 goalrating_player_b__score__gte=GOAL_SIMILARITY_THRESH
             )
-            if temp.count >= 3:
+            if temp.count() >= 3:
                 filtered_matches = temp
             else:
                 print('Less than 3 left after filtering by goal')
@@ -217,6 +221,10 @@ class Profile(models.Model):
                 score=score,
             )
             rating.save()
+            if GoalRating.objects.filter(player_a=player_b, player_b=self).exists():
+                r = GoalRating.objects.get(player_a=player_b, player_b=self)
+                r.score = score
+                r.save()
             return rating
         except ValidationError as e:
             return e.message
