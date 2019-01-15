@@ -151,31 +151,6 @@ class Profile(models.Model):
                 secondary_reason = primary_reason
             primary_reason = 'Matched based on goal similarity'
 
-        # The skeleton of this function would basically be to load
-        # in the current user's goal, and compare it against all
-        # other filtered user goals.
-        # Then, you would sort the filtered_matches list by the goal
-        # similarity score.
-        # print("Considering goal")
-        # nlp = spacy.load('en_core_web_md')
-
-        # user_goal = self.goal
-        # user_nlp=nlp(user_goal)
-        # goallist = []
-
-        # for p in filtered_matches:
-        #    match_goal = p.goal
-        #    match_nlp = nlp(match_goal)
-        #    goal_sim = user_nlp.similarity(match_nlp)
-        #    #now add profile uuid and similarity to an array as a tuple
-        #    goal_tuple = (p.uuid, goal_sim)
-        #    #append each tuple to the goal list
-        #    goallist.append(goal_tuple)
-
-        # Now we order the filtered matches by goal similarity score
-
-        # mapping = dict(filtered_matches)
-        # filtered_matches[:]=[(uuid,mapping[uuid]) for uuid in goallist]
 
         print(
             "{} possible matches left after filtering".format(len(filtered_matches))
