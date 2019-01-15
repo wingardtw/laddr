@@ -1,5 +1,6 @@
 import spacy
 from models import Profile, User
+from backend.settings import DEFAULT_RANK_TOLERANCE, GOAL_SIMILARITY_THRESH
 
 import csv
 with open(r'C:\Users\Jacob\Documents\LaddrBase\laddr\backend\matching\LolDuoCsv.csv','r') as f:
@@ -90,11 +91,13 @@ with open(r'C:\Users\Jacob\Documents\LaddrBase\laddr\backend\matching\nlpresults
            goal_sim = user_nlp.similarity(match_nlp)
            #now add profile uuid and similarity to an array as a tuple
            goal_tuple = (p.uuid, goal_sim)
-           #append each tuple to the goal list
-           goallist.append(goal_tuple)
+           #append each tuple to the goal list IF MATCH IS GREATER THAN THRESHOLD.
+           if (goal_sim>GOAL_SIMILARITY_THRESH):
+               goallist.append(goal_tuple)
     
         # Now we order the filtered matches by goal similarity score
         goallist_asc=sorted(goallist,key=lambda x: x[1],reverse=True)
+
         
         #Then we grab the uuids in order
         uuid_list=[]

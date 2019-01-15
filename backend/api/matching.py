@@ -1,4 +1,4 @@
-from api.models import Profile
+#from api.models import Profile
 # from api.utility import exclude_matches
 import spacy
 
@@ -7,10 +7,10 @@ def score_similarity(nlp, goal_a, goal_b):
 
 nlp = spacy.load('en_core_web_md')
 
-for ProfileA in Profile.objects.all():
-    for ProfileB in Profile.objects.all():
-        if (ProfileA.uuid != ProfileB.uuid):
-            score_similarity(nlp,ProfileA.goal,ProfileB.goal)
+# for ProfileA in Profile.objects.all():
+#     for ProfileB in Profile.objects.all():
+#         if (ProfileA.uuid != ProfileB.uuid):
+#             score_similarity(nlp,ProfileA.goal,ProfileB.goal)
 
 
 
