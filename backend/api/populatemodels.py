@@ -2,6 +2,7 @@ import random
 
 from api.models import Profile, PLAYSTYLES, ROLES, RANKS
 from django.contrib.auth.models import User
+import spacy
 
 # faker import to generate fake data.
 from faker import Faker
@@ -55,3 +56,18 @@ def populate_test_users(N=10):
 
 def populate(n=10):
     populate_test_users(n)
+
+
+def make_goal_matrix():
+    profiles = [
+        user.profile for user in User.objects.filter(profile__is_real=False)
+    ]
+    nlp = spacy.load('en_core_web_md')
+    for p1 in profiles:
+        for p2 in profiles:
+            if p1 is not p2:
+                p1_nlp = nlp(p1.goal)
+                p2_nlp = nlp(p2.goal)
+                score = p1_nlp.similarity(p2_nlp)
+                new_rating = p1._rate_goal(p2, score, overwrite=True)
+                print(new_rating)
