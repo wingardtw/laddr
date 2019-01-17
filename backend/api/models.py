@@ -62,6 +62,10 @@ class Profile(models.Model):
         return self.match_requests_received.all() | self.match_requests_received.all()
 
     @property
+    def duo_partners(self):
+        return self.duopartner_player_a.all() | self.duopartner_player_b.all()
+
+    @property
     def all_goal_ratings(self):
         return self.goalrating_player_a.all()
 
@@ -548,6 +552,14 @@ class DuoPartner(Connection):
         return "Duo pair between {} and {}".format(
             self.player_a.user.username, self.player_b.user.username
         )
+
+    def give_feedback(self, player, feedback):
+        if self.player_a == player:
+            self.player_a_feedback = feedback
+        elif self.player_b == player:
+            self.player_b_feedback = feedback
+        else:
+            raise AssertionError("{} is part of this partnership.".format(player))
 
 
 class Endorsement(models.Model):
