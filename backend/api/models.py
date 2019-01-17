@@ -4,12 +4,11 @@ from __future__ import unicode_literals
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, IntegrityError
-from django.db.models import Q, Case, When
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-import spacy
 
 from backend.settings import DEFAULT_RANK_TOLERANCE, GOAL_SIMILARITY_THRESH
 
@@ -135,53 +134,68 @@ class Profile(models.Model):
         # for other aspects.
 
         if use_goal:
-            print('Considering goal similarity')
-            nlp = spacy.load('en_core_web_md')
+            # print('Considering goal similarity')
+            # nlp = spacy.load('en_core_web_md')
 
-            user_goal = self
-            user_goal_text = user_goal.goal
-            user_nlp = nlp(user_goal_text)
-            goallist = []
+            # user_goal = self
+            # user_goal_text = user_goal.goal
+            # user_nlp = nlp(user_goal_text)
+            # goallist = []
 
-            for p in filtered_matches:
-                match_goal = p.goal
-                match_nlp = nlp(match_goal)
-                goal_sim = user_nlp.similarity(match_nlp)
-                # ow add profile uuid and similarity to an array as a tuple
-                goal_tuple = (p.uuid, goal_sim)
-                # ate goal
-                self._rate_goal(p, goal_sim)
-                # ppend each tuple to the goal list IF MATCH IS GREATER THAN THRESHOLD.
-                if (goal_sim > GOAL_SIMILARITY_THRESH):
-                    goallist.append(goal_tuple)
+            # for p in filtered_matches:
+            #     match_goal = p.goal
+            #     match_nlp = nlp(match_goal)
+            #     goal_sim = user_nlp.similarity(match_nlp)
+            #     # ow add profile uuid and similarity to an array as a tuple
+            #     goal_tuple = (p.uuid, goal_sim)
+            #     # ate goal
+            #     self._rate_goal(p, goal_sim)
+            #     # ppend each tuple to the goal list IF MATCH IS GREATER THAN THRESHOLD
+            #     if (goal_sim > GOAL_SIMILARITY_THRESH):
+            #         goallist.append(goal_tuple)
 
-            # Now we order the filtered matches by goal similarity score
-            goallist_asc = sorted(goallist, key=lambda x: x[1], reverse=True)
+            # # Now we order the filtered matches by goal similarity score
+            # goallist_asc = sorted(goallist, key=lambda x: x[1], reverse=True)
 
-            # Then we grab the uuids in order
-            uuid_list = []
-            for u in goallist_asc:
-                uuid_list.append(u[0])
+            # # Then we grab the uuids in order
+            # uuid_list = []
+            # for u in goallist_asc:
+            #     uuid_list.append(u[0])
 
-            # Finally, use django Case, When to build a new queryset
-            # that preserves the order from the uuid_list which has
-            # been ordered by similarity score
+            # # Finally, use django Case, When to build a new queryset
+            # # that preserves the order from the uuid_list which has
+            # # been ordered by similarity score
 
-            preserved = Case(
-                *[When(pk=pk, then=pos) for pos, pk in enumerate(uuid_list)]
+            # preserved = Case(
+            #     *[When(pk=pk, then=pos) for pos, pk in enumerate(uuid_list)]
+            # )
+            # filtered_matches_goal_ordered = Profile.objects.filter(
+            #     pk__in=uuid_list
+            # ).order_by(preserved)
+            # filtered_matches_goal_ordered_noself = \
+            #     filtered_matches_goal_ordered.exclude(uuid=self.uuid)
+            # filtered_matches_goal_ordered_final = \
+            #     filtered_matches_goal_ordered_noself.exclude(uuid__in=matched_ids)
+
+            # if filtered_matches_goal_ordered_final.count() >= 3:
+            #     filtered_matches = filtered_matches_goal_ordered_final
+            # else:
+            #     print('Less than 3 left after filtering by goal')
+
+            # Get all goal ratings for self above threshold
+
+            goal_rankings = GoalRating.objects.filter(
+                player_a=self, score__gte=GOAL_SIMILARITY_THRESH
             )
-            filtered_matches_goal_ordered = Profile.objects.filter(
-                pk__in=uuid_list
-            ).order_by(preserved)
-            filtered_matches_goal_ordered_noself = \
-                filtered_matches_goal_ordered.exclude(uuid=self.uuid)
-            filtered_matches_goal_ordered_final = \
-                filtered_matches_goal_ordered_noself.exclude(uuid__in=matched_ids)
 
-            if filtered_matches_goal_ordered_final.count() >= 3:
-                filtered_matches = filtered_matches_goal_ordered_final
-            else:
-                print('Less than 3 left after filtering by goal')
+            # Filter all matches such that player_b meets minimum score criteria
+            filtered_matches = filtered_matches.distinct().filter(
+                goalrating_player_b__in=goal_rankings
+            )
+            filtered_matches = filtered_matches.order_by('-goalrating_player_b__score')
+
+            for m in filtered_matches:
+                print(m.goalrating_player_b.filter(player_a=self)[0])
 
             # Shift all 'reasons' down in rank
             if primary_reason:
