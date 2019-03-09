@@ -237,6 +237,26 @@ class Profile(models.Model):
             return rating
         except models.ObjectDoesNotExist as e:
             return e
+    
+    def endorse_player(self, player_b,EndorsementValue):
+        for x in range(self.duo_partners.count()):
+            if (self.duo_partners[x].player_a== player_b or self.duo_partners[x].player_b == player_b):
+                evl = EndorsementValue.lower()
+                if (len(Endorsement.objects.filter(skill=evl))==0):
+                    EndorsementSave = Endorsement(skill=EndorsementValue)
+                    EndorsementSave.save()
+                else:
+                    EndorsementSave = Endorsement.objects.filter(skill=evl)[0]
+                EndorsementToken = Endorsements(
+                    endorsement=EndorsementSave,
+                    endorser = self,
+                    endorsee = player_b)
+                EndorsementToken.save()
+                print("{} has endorsed {} for {}".format(self,player_b,EndorsementValue))
+                break
+
+                
+
 
 
 @receiver(post_save, sender=User)
@@ -539,6 +559,7 @@ class DuoPartner(Connection):
         null=True,
         default=None
     )
+    
     player_a_rating = models.IntegerField(null=True, default=None)
     player_b_rating = models.IntegerField(null=True, default=None)
     suggested_by = models.ForeignKey(
@@ -561,6 +582,8 @@ class DuoPartner(Connection):
         else:
             raise AssertionError("{} is part of this partnership.".format(player))
 
+    
+
 
 class Endorsement(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -570,6 +593,8 @@ class Endorsement(models.Model):
 
     def __str__(self):
         return self.skill
+
+    
 
 
 class Endorsements(models.Model):
@@ -587,6 +612,11 @@ class Endorsements(models.Model):
     )
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "{}".format(
+            self.endorsement
+        )
 
     class Meta:
         unique_together = ('endorser', 'endorsee', 'endorsement')

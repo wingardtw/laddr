@@ -16,4 +16,5 @@ app_name = "api"
 urlpatterns = [
     path("", include(router.urls)),
     url(r"^auth$", drf_views.obtain_auth_token, name="auth"),
+    url(r"^endorse$",views.endorsement_view,name='endorse')
 ]

@@ -8,6 +8,7 @@ from api.models import (
     Profile,
     UserMatch,
 )
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -44,3 +45,10 @@ class EndorsementViewSet(viewsets.ModelViewSet):
 class EndorsementsViewSet(viewsets.ModelViewSet):
     queryset = Endorsements.objects.all().order_by('endorsee')
     serializer_class = serializers.EndorsementsSerializer
+
+def endorsement_view(request):
+    user = request.user
+    player_b = request.data.player_b
+    user_profile = user.Profile
+    player_b_profile = player_b.Profile
+    user_profile.endorse_player(player_b_profile,request.data.endorsement)
