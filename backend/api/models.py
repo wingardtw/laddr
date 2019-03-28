@@ -9,6 +9,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.core.cache import cache
+from django.conf import settings
 
 from backend.settings import DEFAULT_RANK_TOLERANCE, GOAL_SIMILARITY_THRESH
 
@@ -52,6 +54,19 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def last_seen(self):
+        return cache.get('seen_%s' % self.user.username)
+
+    def online(self):
+        if self.last_seen():
+            now = datetime.datetime.now()
+            if now > self.last_seen() + datetime.timedelta(seconds=settings.USER_ONLINE_TIMEOUT):
+                return False
+            else:
+                return True
+        else:
+            return False
 
     @property
     def laddr_matches(self):
@@ -255,10 +270,7 @@ class Profile(models.Model):
                 print("{} has endorsed {} for {}".format(self,player_b,EndorsementValue))
                 break
 
-                
-
-
-
+            
 @receiver(post_save, sender=User)
 def create_or_update_user_profile(sender, instance, created, **kwargs):
     if created:

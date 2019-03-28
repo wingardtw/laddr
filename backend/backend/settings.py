@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'backend.activeuser_middleware.ActiveUserMiddleware'
 ]
 
 REST_FRAMEWORK = {
@@ -130,3 +131,17 @@ DEFAULT_RANK_TOLERANCE = 3
 
 # Default goal similarity threshold
 GOAL_SIMILARITY_THRESH = 0.5
+
+#Databsase Cache setup as per Django docs.
+CACHES ={
+    'default': {
+        'BACKEND':'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION':'laddr_user_cache_table',
+    }
+}
+
+#Timeout for a user to be considered "online". 10 minutes default.
+USER_ONLINE_TIMEOUT=600
+
+# Number of seconds we track inactive users before removed from cache (1 week)
+USER_LASTSEEN_TIMEOUT = 60 * 60 * 24 * 7
