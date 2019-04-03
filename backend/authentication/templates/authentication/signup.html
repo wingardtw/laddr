@@ -1,0 +1,29 @@
+{% extends 'laddr_site/base.html' %}
+{% load staticfiles %}
+
+{%block content%} 
+
+{%if registered%}
+<h1>Thanks for registering!</h1>
+{%else%}
+<h1>Please register here:</h1>
+<h3>Registration form:</h3>
+<form enctype="multipart/form-data" method="post">
+{% csrf_token %}
+<!-- {{ form.as_p }} 
+<input type="submit" name="" value="Register">
+</form> -->
+{% for field in form %}
+    <div class="fieldWrapper">
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+        {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
+
+<input type="submit" name="" value="Register">
+{%endif%}
+
+{% endblock %}
